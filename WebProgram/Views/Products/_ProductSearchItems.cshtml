@@ -1,0 +1,54 @@
+﻿@model ProductSearchViewModel
+
+@{
+    var categories = Model.Categories.Select(x => new SelectListItem
+    {
+        Text = x.Name,
+        Value = x.Id.ToString()
+    });
+    var pageSizes = Model.AvailablePageSizes.Select(x => new SelectListItem
+    {
+        Text = x.ToString(),
+        Value = x.ToString(),
+        Selected = x == Model.PageSize
+    });
+
+}
+
+
+<form asp-action="Index" method="get" class="row mb-4 shadow rounded bg-light">
+    <div class="col-md-3">
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control">
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="mb-3">
+            <label asp-for="CategoryId" class="form-label"></label>
+            @Html.DropDownListFor(x => x.CategoryId, categories, new { @class = "form-select" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <input asp-for="Description" class="form-control">
+        </div>
+    </div>
+    
+    <div class="col-md-2">
+        <div class="mb-3">
+            <label class="form-label">Елементів на сторінці</label>
+            @Html.DropDownListFor(x => x.PageSize, pageSizes, new { @class = "form-select" })
+        </div>
+    </div>
+
+
+    <div class="col-md-2 d-flex align-items-center justify-content-center">
+        <input type="submit" value="Пошук" class="btn btn-primary" />
+        <a asp-action="Index" class="ms-2 btn btn-info">Очистити</a>
+    </div>
+
+</form>
