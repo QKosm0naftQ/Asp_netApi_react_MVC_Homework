@@ -2,6 +2,7 @@
 import {Link} from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 import {BASE_URL} from "../../api/apiConfig";
+import { Category } from '../../models/Category'; 
 
 const CategoriesPage = () => {
 
@@ -12,10 +13,11 @@ const CategoriesPage = () => {
         axiosInstance.get("/api/Categories")
             .then(res => {
                 const { data } = res;
-                console.log("res", res.data);
-                setList(data);
+                //console.log("res", res.data);
+                const categories = data.map(item => Category.fromJson(item));
+                setList(categories);
             }).catch(err => console.log("Proble<:", err));
-        console.log("userEeffect", " - After render");
+        //console.log("userEeffect", " - After render");
     }, []);
     return (
         <div>
@@ -40,6 +42,9 @@ const CategoriesPage = () => {
                                 <td>{item.name}</td>
                                 <td>{item.slug}</td>
                                 <td><img src={`${BASE_URL}/images/200_${item.image}`} alt={item.name} width={75} /></td>
+                                <td>
+                                    <Link to={`edit/${item.id}`} className={"btn btn-primary"}>Edit</Link>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

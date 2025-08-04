@@ -6,6 +6,7 @@ import Layout from "./components/Layout";
 import NoMatch from "./Pages/NoMatch";
 import HomePage from "./Pages/Home";
 import CategoriesCreatePage from "./Pages/categories/Create"
+import CategoriesEditPage from "./Pages/categories/Edit"
 const App = () => {
     return (
 //<CategoriesPage />
@@ -16,6 +17,7 @@ const App = () => {
                     <Route path={"categories"}>
                         <Route index element={<CategoriesPage />} />
                         <Route path={"create"} element={<CategoriesCreatePage />} />
+                        <Route path={"edit/:id"} element={<CategoriesEditPage />} />
                     </Route>
                     
                     <Route path="*" element={<NoMatch />} />
