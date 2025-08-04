@@ -1,14 +1,29 @@
 //import logo from './logo.svg';
 import './App.css';
 import CategoriesPage from './Pages/categories';
-
+import {Route, Routes} from "react-router-dom";
+import Layout from "./components/Layout";
+import NoMatch from "./Pages/NoMatch";
+import HomePage from "./Pages/Home";
+import CategoriesCreatePage from "./Pages/categories/Create"
 const App = () => {
     return (
+//<CategoriesPage />
         <>
-            <CategoriesPage />
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path={"categories"}>
+                        <Route index element={<CategoriesPage />} />
+                        <Route path={"create"} element={<CategoriesCreatePage />} />
+                    </Route>
+                    
+                    <Route path="*" element={<NoMatch />} />
+                </Route>
+            </Routes>
         </>
     );
-
+    
     //return (
     //<div className="App">
     //  <header className="App-header">
