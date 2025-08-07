@@ -37,10 +37,6 @@ namespace WebApiPizushi.Controllers
         {
             try
             {
-                if (model.Image == null || model.Image.Length == 0)
-                {
-                    return BadRequest("Погане фото/bad");
-                }
                 var entity = await appDbPizushiContext.Categories.SingleOrDefaultAsync(x => x.Name == model.Name);
                 if (entity != null)
                 {
