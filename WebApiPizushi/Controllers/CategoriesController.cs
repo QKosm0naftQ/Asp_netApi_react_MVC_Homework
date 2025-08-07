@@ -17,7 +17,10 @@ namespace WebApiPizushi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetElement(int id)
         {
-            var model = await appDbPizushiContext.Categories.SingleOrDefaultAsync(x => x.Id == id);
+            //var model = await appDbPizushiContext.Categories.SingleOrDefaultAsync(x => x.Id == id); 
+            var model = await mapper
+                        .ProjectTo<CategoryItemModel>(appDbPizushiContext.Categories.Where(x => x.Id == id))
+                        .SingleOrDefaultAsync();
             if (model == null)
             {
                 return NotFound();
@@ -37,12 +40,12 @@ namespace WebApiPizushi.Controllers
         {
             try
             {
-                var entity = await appDbPizushiContext.Categories.SingleOrDefaultAsync(x => x.Name == model.Name);
-                if (entity != null)
-                {
-                    return BadRequest("Така категорія вже існує!");
-                }
-                entity = mapper.Map<CategoryEntity>(model);
+                //var entity = await appDbPizushiContext.Categories.SingleOrDefaultAsync(x => x.Name == model.Name);
+                //if (entity != null)
+                //{
+                //    return BadRequest("Така категорія вже існує!");
+                //}
+                var entity = mapper.Map<CategoryEntity>(model);
                 entity.Image = await imageService.SaveImageAsync(model.Image);
                 await appDbPizushiContext.Categories.AddAsync(entity);
                 await appDbPizushiContext.SaveChangesAsync();
@@ -55,34 +58,26 @@ namespace WebApiPizushi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditCategory(int id , [FromForm] CategoryCreateItemModel model)
+        public async Task<IActionResult> EditCategory(int id , [FromForm] CategoryEditItemModel model)
         {
             try
             {
-                var entity = await appDbPizushiContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
-                if (entity == null)
-                    return NotFound();
-
-                // Перевіряємо чи існує інша категорія з таким іменем
-                var existingCategory = await appDbPizushiContext.Categories
-                    .FirstOrDefaultAsync(x => x.Name == model.Name && x.Id != id);
-                if (existingCategory != null)
-                    return BadRequest("Така категорія вже існує!");
-
-                if (model.Image != null && model.Image.Length > 0)
+                var existing = await appDbPizushiContext.Categories.FirstOrDefaultAsync(x => x.Id == model.Id);
+                if (existing == null)
                 {
-                    // Видаляємо старе зображення
-                    if (!string.IsNullOrEmpty(entity.Image))
-                        await imageService.DeleteImageAsync(entity.Image);
-            
-                    entity.Image = await imageService.SaveImageAsync(model.Image);
+                    return NotFound();
                 }
 
-                entity.Name = model.Name;
-                entity.Slug = model.Slug;
-
+                existing = mapper.Map(model, existing);
+                
+                if (model.Image != null)
+                {
+                    await imageService.DeleteImageAsync(existing.Image);
+                    existing.Image = await imageService.SaveImageAsync(model.Image);
+                }
                 await appDbPizushiContext.SaveChangesAsync();
-                return Ok("Категорію успішно оновлено");
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -90,5 +85,32 @@ namespace WebApiPizushi.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                var existing = await appDbPizushiContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
+                if (existing == null)
+                    return NotFound();
+
+                await imageService.DeleteImageAsync(existing.Image);
+                appDbPizushiContext.Categories.Remove(existing);
+                await appDbPizushiContext.SaveChangesAsync();
+
+                return Ok(new { message = "Категорію успішно видалено" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Сталася помилка при видаленні");
+            }
+        }
+
+        
+        
+        
+        
+        
+        
     }
 }

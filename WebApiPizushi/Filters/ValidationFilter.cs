@@ -6,7 +6,7 @@ namespace WebApiPizushi.Filters;
 
 public class ValidationFilter : IAsyncActionFilter
 {
-    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+ public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         foreach (var argument in context.ActionArguments.Values)
         {
@@ -32,11 +32,22 @@ public class ValidationFilter : IAsyncActionFilter
                         var errors = (IEnumerable<FluentValidation.Results.ValidationFailure>)
                             validationResult?.GetType().GetProperty("Errors")?.GetValue(validationResult)!;
 
-                        context.Result = new BadRequestObjectResult(errors.Select(e => new
+                        var errorDict = errors
+                            .GroupBy(e => e.PropertyName)
+                            .ToDictionary(
+                                g => g.Key,
+                                g => g.Select(e => e.ErrorMessage).ToArray()
+                            );
+
+                        context.Result = new BadRequestObjectResult(new
                         {
-                            field = e.PropertyName,
-                            error = e.ErrorMessage
-                        }));
+                            //type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                            //title = "One or more validation errors occurred.",
+                            status = 400,
+                            isValid = false,
+                            errors = errorDict,
+                            //traceId = context.HttpContext.TraceIdentifier
+                        });
 
                         return;
                     }

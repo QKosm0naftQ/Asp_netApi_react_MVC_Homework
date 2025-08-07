@@ -5,9 +5,9 @@ using WebApiPizushi.Models.Category;
 
 namespace WebApiPizushi.Validators.Category;
 
-public class CategoryCreateValidator : AbstractValidator<CategoryCreateItemModel>
+public class CategoryEditValidator : AbstractValidator<CategoryEditItemModel>
 {
-    public CategoryCreateValidator(AppDbPizushiContext db)
+    public CategoryEditValidator(AppDbPizushiContext db)
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -29,11 +29,5 @@ public class CategoryCreateValidator : AbstractValidator<CategoryCreateItemModel
             .WithMessage("Слаг є обов'язковим")
             .MaximumLength(250)
             .WithMessage("Слаг повинен містити не більше 250 символів");
-
-        RuleFor(x => x.Image)
-            //.NotNull().WithMessage("Файл зображення є обов'язковим")
-            .NotEmpty().WithMessage("Файл зображення є обов'язковим");
-        //.Must(file => file!.Length > 0)
-        //.WithMessage("Файл не повинен бути порожнім");
     }
 }

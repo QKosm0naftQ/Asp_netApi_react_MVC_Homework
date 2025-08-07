@@ -17,6 +17,7 @@ export class Category {
 
     toFormData() {
         const formData = new FormData();
+        formData.append("Id", this.id);
         formData.append("Name", this.name);
         formData.append("Slug", this.slug);
         if (this.image instanceof File) {

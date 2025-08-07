@@ -19,6 +19,22 @@ const CategoriesPage = () => {
             }).catch(err => console.log("Proble<:", err));
         //console.log("userEeffect", " - After render");
     }, []);
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Ви впевнені, що хочете видалити цю категорію?")) return;
+
+        try {
+            await axiosInstance.delete(`/api/Categories/${id}`);
+            setList(prev => prev.filter(item => item.id !== id));
+            alert("Категорію успішно видалено");
+        } catch (err) {
+            console.error("Помилка при видаленні:", err);
+            alert("Не вдалося видалити категорію.");
+        }
+    };
+    
+    
+    
     return (
         <div>
             <h1 className={"text-center"}>Категорії</h1>
@@ -45,6 +61,9 @@ const CategoriesPage = () => {
                                 <td>
                                     <Link to={`edit/${item.id}`} className={"btn btn-primary"}>Edit</Link>
                                 </td>
+                                <td>
+                                    <button className={"btn btn-danger"} onClick={() => handleDelete(item.id)}>Delete</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -52,5 +71,10 @@ const CategoriesPage = () => {
             }
         </div>
     );
+
+
 }
+
+
+
 export default CategoriesPage;

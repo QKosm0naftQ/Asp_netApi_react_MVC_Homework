@@ -11,8 +11,8 @@ import * as Yup from "yup";
 import {useFormik} from "formik";
 
 const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    slug: Yup.string().required("Slug is required"),
+    name: Yup.string().required("Назва обов'язкова!"),
+    slug: Yup.string().required("Slug обов'язковий!"),
     Image: Yup.mixed().nullable()
 });
 const CategoriesCreatePage = () => {
@@ -41,10 +41,7 @@ const CategoriesCreatePage = () => {
         } catch(error) {
             if (error.response) {
                 console.log("Server Error Data:", error.response.data);
-                const errorArray = Array.isArray(error.response.data)
-                    ? error.response.data
-                    : [{ field: "global", error: String(error.response.data) }];
-                setServerErrors(errorArray);
+                setServerErrors(error.response.data);
             } else {
                 setServerErrors([{
                     field: "global",
@@ -99,18 +96,22 @@ const CategoriesCreatePage = () => {
                 <BaseFileInput
                     label={"Оберіть фото"}
                     field={"Image"}
+                    error={errors.Image}
+                    touched={touched.Image}
                     onChange={onHandleFileChange}
                 />
 
-                {Array.isArray(serverErrors) && serverErrors.length > 0 && (
+                {serverErrors && serverErrors.errors && (
                     <div className="alert alert-danger">
-                        {serverErrors.map((error, index) => (
-                            <div key={index} className="text-danger">
-                                {error.field !== "global" ? `${error.field}: ` : ''}{error.error}
+                        {Object.entries(serverErrors.errors).map(([fieldName, errorMessages]) => (
+                            <div key={fieldName} className="text-danger">
+                                {`${fieldName}: ${errorMessages[0]}`}
                             </div>
                         ))}
                     </div>
                 )}
+
+
 
 
                 <button type="submit" className="btn btn-primary">Додати</button>

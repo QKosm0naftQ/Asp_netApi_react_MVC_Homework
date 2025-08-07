@@ -12,7 +12,14 @@ namespace WebApiPizushi.Mapper
             CreateMap<SeederCategoryModel, CategoryEntity>();
             CreateMap<CategoryEntity, CategoryItemModel>();
             CreateMap<CategoryCreateItemModel, CategoryEntity>()
-              .ForMember(x => x.Image , opt => opt.Ignore());
+                .ForMember(x => x.Name, opt => opt.MapFrom(x=>x.Name.Trim()))
+                .ForMember(x => x.Slug, opt => opt.MapFrom(x => x.Slug.Trim()))
+                .ForMember(x => x.Image, opt => opt.Ignore());
+
+            CreateMap<CategoryEditItemModel, CategoryEntity>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(x => x.Name.Trim()))
+                .ForMember(x => x.Slug, opt => opt.MapFrom(x => x.Slug.Trim()))
+                .ForMember(x => x.Image, opt => opt.Ignore());
 
         }
     }
