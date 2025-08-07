@@ -4,11 +4,15 @@
 	<TargetFramework>net9.0</TargetFramework>
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<NoWarn>1591</NoWarn>
+		
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
 			<PrivateAssets>all</PrivateAssets>
@@ -24,8 +28,11 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Update="Helpers\JsonData\Categories.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="Helpers\JsonData\Users.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	  	<Content Update="Helpers\JsonData\Categories.json">
+	    	<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  	</Content>
 	</ItemGroup>
 </Project>
