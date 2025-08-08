@@ -1,0 +1,47 @@
+﻿@model WebProgram.Models.Account.LoginViemModel
+
+@{
+    ViewData["Title"] = "Вхід";
+}
+
+<h1 class="text-center mt-4 mb-4">Вхід до акаунту</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-5">
+        <form asp-action="Login" class="p-4 shadow-sm rounded bg-light">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold"></label>
+                <input asp-for="Email" class="form-control" placeholder="Email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <!-- Пароль -->
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label fw-semibold"></label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="Пароль" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+            <!-- Відновлення -->
+
+            <div class="mb-2 text-end">
+                <a asp-action="ForgotPassword" 
+                   class="btn btn-link">Відновити пароль</a>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="d-grid gap-2">
+                <input type="submit" value="Увійти" class="btn btn-success" />
+                <a asp-action="Register" class="btn btn-outline-secondary">Реєстрація</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

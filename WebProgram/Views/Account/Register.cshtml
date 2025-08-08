@@ -1,0 +1,90 @@
+﻿@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<h1 class="text-center mt-4 mb-4">@ViewData["Title"]</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <form asp-action="Register" enctype="multipart/form-data" class="p-4 shadow-sm rounded bg-light">
+
+            <!-- Аватар -->
+            <div class="mb-4 text-center">
+                <label asp-for="Image" class="d-block">
+                    <img id="defaultAvatar"
+                         src="/DefaultImage/RegImage.png"
+                         alt="Аватар"
+                         class="border rounded-circle shadow"
+                         style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;" />
+
+                    <div id="croppedPreview"
+                         class="border rounded-circle shadow d-none mx-auto"
+                         style="width: 150px; height: 150px; object-fit: cover; overflow: hidden; cursor: pointer;"></div>
+                </label>
+
+                <input asp-for="Image"
+                       type="file"
+                       accept="image/*"
+                       class="d-none" />
+                <input type="hidden" id="croppedImageData" name="CroppedImage" />
+            </div>
+
+            @await Html.PartialAsync("_ImageCropper")
+
+            <!-- Валідація -->
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- Ім’я -->
+            <div class="mb-3">
+                <label asp-for="FirstName" class="form-label fw-semibold"></label>
+                <input asp-for="FirstName" class="form-control" placeholder="Ім’я" />
+                <span asp-validation-for="FirstName" class="text-danger small"></span>
+            </div>
+
+            <!-- Прізвище -->
+            <div class="mb-3">
+                <label asp-for="LastName" class="form-label fw-semibold"></label>
+                <input asp-for="LastName" class="form-control" placeholder="Прізвище" />
+                <span asp-validation-for="LastName" class="text-danger small"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold"></label>
+                <input asp-for="Email" class="form-control" placeholder="Email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <!-- Пароль -->
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label fw-semibold"></label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="Пароль" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <!-- Підтвердження пароля -->
+            <div class="mb-4">
+                <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Підтвердіть пароль" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="d-grid gap-2">
+                <input type="submit" value="Зареєструватися" class="btn btn-success" />
+                <a asp-action="Index" asp-controller="Categories" class="btn btn-outline-secondary">На головну</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="/js/cropper.min.js"></script>
+    <script src="/js/cropImageOnForm.js"></script>
+}

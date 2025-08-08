@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{EE80DF7A-3B66-4AAD-91CA-28BAD5BA3C4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{4944AD06-9097-42C8-BA23-D199D0D71BD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiPizushi", "WebApiPizushi\WebApiPizushi.csproj", "{8CD6D47B-E901-400F-A405-B30A48BA9A7C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE80DF7A-3B66-4AAD-91CA-28BAD5BA3C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE80DF7A-3B66-4AAD-91CA-28BAD5BA3C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE80DF7A-3B66-4AAD-91CA-28BAD5BA3C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE80DF7A-3B66-4AAD-91CA-28BAD5BA3C4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4944AD06-9097-42C8-BA23-D199D0D71BD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4944AD06-9097-42C8-BA23-D199D0D71BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4944AD06-9097-42C8-BA23-D199D0D71BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4944AD06-9097-42C8-BA23-D199D0D71BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CD6D47B-E901-400F-A405-B30A48BA9A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CD6D47B-E901-400F-A405-B30A48BA9A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CD6D47B-E901-400F-A405-B30A48BA9A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CD6D47B-E901-400F-A405-B30A48BA9A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
