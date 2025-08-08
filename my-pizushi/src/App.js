@@ -7,9 +7,24 @@ import NoMatch from "./Pages/NoMatch";
 import HomePage from "./Pages/Home";
 import CategoriesCreatePage from "./Pages/categories/Create"
 import CategoriesEditPage from "./Pages/categories/Edit"
+import Error500 from "./Pages/Error500";
+import LoginPage from "./Pages/account/Login";
+import {useAuthStore} from "./store/authStore";
+import {jwtDecode} from "jwt-decode";
+import {useEffect} from "react";
 const App = () => {
+
+    const { setUser } = useAuthStore((state) => state);
+
+    useEffect(() => {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+            const decoded = jwtDecode(token);
+            setUser(decoded);
+        }
+    },[]);
+    
     return (
-//<CategoriesPage />
         <>
             <Routes>
                 <Route path="/" element={<Layout />}>
@@ -19,31 +34,15 @@ const App = () => {
                         <Route path={"create"} element={<CategoriesCreatePage />} />
                         <Route path={"edit/:id"} element={<CategoriesEditPage />} />
                     </Route>
+                    <Route path={"login"} element={<LoginPage/>}/>
+
+                    <Route path="500" element={<Error500 />} />
                     
                     <Route path="*" element={<NoMatch />} />
                 </Route>
             </Routes>
         </>
     );
-    
-    //return (
-    //<div className="App">
-    //  <header className="App-header">
-    //    <img src={logo} className="App-logo" alt="logo" />
-    //    <p>
-    //      Edit <code>src/App.js</code> and save to reload.
-    //    </p>
-    //    <a
-    //      className="App-link"
-    //      href="https://reactjs.org"
-    //      target="_blank"
-    //      rel="noopener noreferrer"
-    //    >
-    //      Learn React
-    //    </a>
-    //  </header>
-    //</div>
-  //);
 }
 
 export default App;

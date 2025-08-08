@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApiPizushi.Constants;
 using WebApiPizushi.Data;
 using WebApiPizushi.Data.Entities;
 using WebApiPizushi.Interfaces;
@@ -15,6 +17,7 @@ namespace WebApiPizushi.Controllers
         (AppDbPizushiContext appDbPizushiContext ,IMapper mapper , IImageService imageService): ControllerBase
     {
         [HttpGet("{id}")]
+        [Authorize(Roles = $"{Roles.Admin}")]
         public async Task<IActionResult> GetElement(int id)
         {
             //var model = await appDbPizushiContext.Categories.SingleOrDefaultAsync(x => x.Id == id); 
