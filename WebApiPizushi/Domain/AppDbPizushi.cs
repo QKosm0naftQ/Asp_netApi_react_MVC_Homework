@@ -10,7 +10,16 @@ namespace Domain
         public AppDbPizushiContext(DbContextOptions<AppDbPizushiContext> options) : base(options) {}
 
         public DbSet<CategoryEntity> Categories { get; set; }
-
+        public DbSet<IngredientEntity> Ingredients { get; set; }
+        
+        public DbSet<ProductSizeEntity> ProductSizes { get; set; }
+        
+        public DbSet<ProductEntity> Products { get; set; }
+        
+        public DbSet<ProductIngredientEntity> ProductIngredients { get; set; }
+        
+        public DbSet<ProductImageEntity> ProductImages { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -26,6 +35,8 @@ namespace Domain
                     .HasForeignKey(u => u.UserId)
                     .IsRequired();
             });
+            builder.Entity<ProductIngredientEntity>()
+                .HasKey(pi => new { pi.ProductId, pi.IngredientId });
         }
         
         

@@ -29,6 +29,12 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
 	</ItemGroup>
 	<ItemGroup>
+		<Content Update="Helpers\JsonData\ProductSizes.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Helpers\JsonData\Ingredients.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 		<Content Update="Helpers\JsonData\Users.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
