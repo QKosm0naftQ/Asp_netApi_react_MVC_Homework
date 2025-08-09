@@ -26,6 +26,11 @@ const Header = () => {
                                 Категорії
                             </NavLink>
                         </li>
+                        <li className="nav-item">
+                            <NavLink to="/products" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+                                Продукти
+                            </NavLink>
+                        </li>
                     </ul>
 
                     <ul className="navbar-nav ms-auto">
