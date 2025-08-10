@@ -81,6 +81,9 @@ const ProductsPage = () => {
                                     <Button variant="primary">
                                         <Link to={`product/${product.id}`} className={"text-white text-decoration-none"}>Show</Link>
                                     </Button>
+                                    {/*<Button className={"mt-2"} variant="success">*/}
+                                    <Link to={`edit/${product.id}`} className={"btn btn-success mt-1"}>Edit</Link>
+                                    {/*</Button>*/}
                                 </div>
                             </Card.Body>
                         </Card>

@@ -11,4 +11,5 @@ public interface IProductService
     Task<ProductEntity> Create(ProductCreateModel model);
     public Task<IEnumerable<ProductIngredientModel>> GetIngredientsAsync();
     public Task<IEnumerable<ProductSizeModel>> GetSizesAsync();
+    Task<ProductItemModel> Edit(ProductEditModel model);
 }

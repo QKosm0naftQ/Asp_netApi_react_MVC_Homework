@@ -15,6 +15,8 @@ import {useEffect} from "react";
 import ProductsPage from "./Pages/products";
 import ProductPage from "./Pages/products/product";
 import CreateProductPage from "./Pages/products/Create";
+import TestingPage from "./Pages/Testing";
+import EditProductPage from "./Pages/products/Edit";
 const App = () => {
 
     const { setUser } = useAuthStore((state) => state);
@@ -40,11 +42,13 @@ const App = () => {
                     <Route path={"products"}>
                         <Route index element={<ProductsPage/>} />
                         <Route path={"product/:id"} element={<ProductPage/>} />
+                        <Route path={"edit/:id"} element={<EditProductPage/>} />
                         <Route path={"create"} element={<CreateProductPage/>} />
                     </Route>
                         
                     <Route path={"login"} element={<LoginPage/>}/>
-
+                    <Route path={"testing"} element={<TestingPage/>}/>
+                    
                     <Route path="500" element={<Error500 />} />
                     
                     <Route path="*" element={<NoMatch />} />
