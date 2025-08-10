@@ -14,7 +14,7 @@ import {jwtDecode} from "jwt-decode";
 import {useEffect} from "react";
 import ProductsPage from "./Pages/products";
 import ProductPage from "./Pages/products/product";
-
+import CreateProductPage from "./Pages/products/Create";
 const App = () => {
 
     const { setUser } = useAuthStore((state) => state);
@@ -40,6 +40,7 @@ const App = () => {
                     <Route path={"products"}>
                         <Route index element={<ProductsPage/>} />
                         <Route path={"product/:id"} element={<ProductPage/>} />
+                        <Route path={"create"} element={<CreateProductPage/>} />
                     </Route>
                         
                     <Route path={"login"} element={<LoginPage/>}/>

@@ -14,8 +14,10 @@ public class ProductMapper : Profile
                 .MapFrom(x => x.ProductImages!.OrderBy(p => p.Priority)))
             .ForMember(src => src.Ingredients, opt => opt
                 .MapFrom(x => x.ProductIngredients!.Select(q => q.Ingredient)));
+        CreateMap<ProductCreateModel, ProductEntity>()
+            .ForMember(x => x.ProductImages, opt => opt.Ignore())
+            .ForMember(x => x.ProductIngredients, opt => opt.Ignore());
 
-                
         //.ForMember(x => x.ProductIngredients, opt => opt.MapFrom(
         //    src => src.ProductIngredients != null ?
         //    src.ProductIngredients.Where(p => p.ProductId == src.Id)

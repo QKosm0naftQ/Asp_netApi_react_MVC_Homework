@@ -54,6 +54,9 @@ const ProductsPage = () => {
     return (
         <Container className="my-4">
             <h2 className="mb-4 text-center">Продукти</h2>
+            <div>
+                <Link to={"create"}  className={"btn btn-success"}>Додати продукт</Link>
+            </div>
             <Row xs={1} sm={2} md={3} lg={4} className="g-4">
                 {groupedProducts.map(product => (
                     <Col key={product.slug}>
