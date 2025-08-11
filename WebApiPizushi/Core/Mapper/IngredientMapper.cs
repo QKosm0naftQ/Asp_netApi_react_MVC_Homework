@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Models.Product;
+using Core.Models.Product.Ingredient;
 using Core.Models.Seeder;
 using Domain.Entities;
 
@@ -11,5 +12,7 @@ public class IngredientMapper : Profile
     {
         CreateMap<SeederIngredientModel, IngredientEntity>();
         CreateMap<IngredientEntity, ProductIngredientModel>();
+        CreateMap<CreateIngredientModel, IngredientEntity>()
+            .ForMember(x => x.Image, opt => opt.Ignore());
     }
 }

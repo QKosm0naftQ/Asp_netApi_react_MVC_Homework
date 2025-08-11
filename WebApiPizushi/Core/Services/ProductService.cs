@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Core.Interface;
 using Core.Models.Product;
+using Core.Models.Product.Ingredient;
 using Domain;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,7 @@ public class ProductService(
     public async Task<List<ProductItemModel>> List()
     {
         var model = await context.Products
+            .Where(x=>!x.IsDeleted)
             .ProjectTo<ProductItemModel>(mapper.ConfigurationProvider)
             .ToListAsync();
 
@@ -79,6 +81,12 @@ public class ProductService(
     }
     public async Task<ProductItemModel> Edit(ProductEditModel model)
     {
+        var entity = await context.Products
+            .Where(x => x.Id == model.Id)
+            .SingleOrDefaultAsync();
+
+        mapper.Map(model, entity);
+
         var item = await context.Products
             .Where(x => x.Id == model.Id)
             .ProjectTo<ProductItemModel>(mapper.ConfigurationProvider)
@@ -136,8 +144,23 @@ public class ProductService(
             p++;
 
         }
+        var existingIngredients = context.ProductIngredients
+            .Where(pi => pi.ProductId == item.Id);
 
+        context.ProductIngredients.RemoveRange(existingIngredients);
 
+        if (model.IngredientIds != null)
+        {
+            foreach (var ingredientId in model.IngredientIds.Distinct())
+            {
+                var newIngredient = new ProductIngredientEntity
+                {
+                    ProductId = item.Id,
+                    IngredientId = ingredientId
+                };
+                context.ProductIngredients.Add(newIngredient);
+            }
+        }
         await context.SaveChangesAsync();
         return item;
     }
@@ -155,5 +178,36 @@ public class ProductService(
             .ProjectTo<ProductSizeModel>(mapper.ConfigurationProvider)
             .ToListAsync();
         return sizes;
+    }
+    public async Task<ProductIngredientModel> UploadIngredient(CreateIngredientModel model)
+    {
+        var entity = mapper.Map<IngredientEntity>(model);
+        entity.Image = await imageService.SaveImageAsync(model.ImageFile!);
+        context.Ingredients.Add(entity);
+        await context.SaveChangesAsync();
+
+        return mapper.Map<ProductIngredientModel>(entity);
+    }
+    public async Task Delete(long id)
+    {
+        var product = await context.Products.Where(x => x.Id == id)
+            //.Include(x => x.ProductIngredients)
+            //.Include(x => x.ProductImages)
+            .FirstOrDefaultAsync();
+        product!.IsDeleted = true;
+        //if (product!.ProductIngredients != null)
+        //{
+        //    context.ProductIngredients.RemoveRange(product.ProductIngredients);
+        //}
+        //if (product.ProductImages != null)
+        //{
+        //    foreach (var image in product.ProductImages)
+        //    {
+        //        await imageService.DeleteImageAsync(image.Name);
+        //    }
+        //    context.ProductImages.RemoveRange(product!.ProductImages);
+        //}
+        //context.Products.Remove(product);
+        await context.SaveChangesAsync();
     }
 }

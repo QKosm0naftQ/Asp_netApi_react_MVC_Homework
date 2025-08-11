@@ -1,5 +1,6 @@
 using Core.Interface;
 using Core.Models.Product;
+using Core.Models.Product.Ingredient;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApiPizushi.Controllers;
@@ -70,4 +71,19 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return Ok(ingredients);
     }
+    [HttpPost("ingredients")]
+    public async Task<IActionResult> CreateIngredient([FromForm] CreateIngredientModel model)
+    {
+        var ingredient = await productService.UploadIngredient(model);
+        if (ingredient != null)
+            return Ok(ingredient);
+        return BadRequest();
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(long id)
+    {
+        await productService.Delete(id);
+        return Ok();
+    }
+    
 }
