@@ -57,6 +57,14 @@ builder.Services.AddScoped<IImageService,ImageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+//Щоб отримати доступ до HttpContext в сервісах
+builder.Services.AddHttpContextAccessor();
+//
+
+
 
 // Валідація і фільтри
 builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());

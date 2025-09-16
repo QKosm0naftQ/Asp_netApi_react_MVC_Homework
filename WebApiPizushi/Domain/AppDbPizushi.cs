@@ -20,6 +20,7 @@ namespace Domain
         
         public DbSet<ProductImageEntity> ProductImages { get; set; }
         
+        public DbSet<CartEntity> Carts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -37,6 +38,8 @@ namespace Domain
             });
             builder.Entity<ProductIngredientEntity>()
                 .HasKey(pi => new { pi.ProductId, pi.IngredientId });
+            builder.Entity<CartEntity>()
+                .HasKey(pi => new { pi.ProductId, pi.UserId });
         }
         
         
