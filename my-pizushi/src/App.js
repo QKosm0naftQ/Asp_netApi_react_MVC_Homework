@@ -17,17 +17,30 @@ import ProductPage from "./Pages/products/product";
 import CreateProductPage from "./Pages/products/Create";
 import TestingPage from "./Pages/Testing";
 import EditProductPage from "./Pages/products/Edit";
+import {useCartStore} from "./store/cartStore";
 const App = () => {
 
     const { setUser } = useAuthStore((state) => state);
+    const loadCart = useCartStore((state) => state.loadCart);
+
+    const checkAuth = async () => {
+        try {
+            const token = localStorage.getItem("jwt");
+            if (token) {
+                const decoded = jwtDecode(token);
+                await setUser(decoded);
+            }
+            await loadCart();
+            console.log("View load data");
+
+        } catch (error) {
+            console.error("Error checking authentication:", error);
+        }
+    };
 
     useEffect(() => {
-        const token = localStorage.getItem("jwt");
-        if (token) {
-            const decoded = jwtDecode(token);
-            setUser(decoded);
-        }
-    },[]);
+        checkAuth();
+    }, []);
     
     return (
         <>

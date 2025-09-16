@@ -43,4 +43,15 @@ public class CartService(AppDbPizushiContext pizushiContext,
 
         return items;
     }
+    public async Task Delete(long id)
+    {
+        var userId = await authService.GetUserId();
+        var item = await pizushiContext.Carts
+            .SingleOrDefaultAsync(x => x.UserId == userId && x.ProductId == id);
+        if (item != null)
+        {
+            pizushiContext.Carts.Remove(item);
+            await pizushiContext.SaveChangesAsync();
+        }
+    }
 }

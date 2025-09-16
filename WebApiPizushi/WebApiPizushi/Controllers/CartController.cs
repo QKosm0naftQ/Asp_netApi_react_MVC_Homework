@@ -22,5 +22,12 @@ namespace WebApiPizushi.Controllers
             var model =  await cartService.GetCartItems();
             return Ok(model);
         }
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            await cartService.Delete(id);
+            return Ok();
+        }
     }
 }
