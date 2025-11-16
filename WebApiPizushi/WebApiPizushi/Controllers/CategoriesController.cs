@@ -17,7 +17,7 @@ namespace WebApiPizushi.Controllers
     public class CategoriesController 
         (ICategoryService categoryService): ControllerBase
     {
-        [Authorize(Roles = $"{Roles.Admin}")]
+        //[Authorize(Roles = $"{Roles.Admin}")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetItemById(int id)
         {

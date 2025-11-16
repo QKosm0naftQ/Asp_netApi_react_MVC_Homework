@@ -8,7 +8,7 @@ import CategoriesListPage from "./pages/Categories";
 import NotFound from "./pages/OtherPage/NotFound.tsx";
 
 import CategoriesCreatePage from "./pages/Categories/create";
-
+import CategoriesEditPage from "./pages/Categories/edit";
 const App: React.FC = () => {
 
     return (
@@ -27,6 +27,7 @@ const App: React.FC = () => {
                         <Route path="categories">
                             <Route index  element={<CategoriesListPage />} />
                             <Route path={'create'} element={<CategoriesCreatePage/>}/>
+                            <Route path={'edit/:id'} element={<CategoriesEditPage/>}/>
                         </Route>
                     </Route>
 

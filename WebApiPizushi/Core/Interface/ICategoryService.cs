@@ -9,4 +9,5 @@ public interface ICategoryService
     Task<CategoryItemModel> Create(CategoryCreateItemModel model);
     Task<CategoryItemModel> Update(CategoryEditItemModel model);
     Task<int> Delete(int id);
+    //     Task Delete(long id);
 }

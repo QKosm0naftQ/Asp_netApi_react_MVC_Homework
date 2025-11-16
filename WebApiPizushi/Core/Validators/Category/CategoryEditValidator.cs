@@ -18,8 +18,12 @@ public class CategoryEditValidator : AbstractValidator<CategoryEditItemModel>
             .DependentRules(() =>
             {
                 RuleFor(x => x.Name)
-                    .MustAsync(async (name, cancellation) =>
-                        !await db.Categories.AnyAsync(c => c.Name.ToLower() == name.ToLower().Trim(), cancellation))
+                    //.MustAsync(async (name, cancellation) =>
+                      //  !await db.Categories.AnyAsync(c => c.Name.ToLower() == name.ToLower().Trim(), cancellation))
+                    .MustAsync(async (model, name, cancellation) =>
+                        !await db.Categories
+                        .AnyAsync(c => c.Name.ToLower() == name.ToLower().Trim()
+                            && c.Id != model.Id, cancellation))
                     .WithMessage("Категорія з такою назвою вже існує");
             })
             .MaximumLength(250)

@@ -70,4 +70,13 @@ public class CategoryService(AppDbPizushiContext pizushiContext,
             return 0;
         }
     }
+    /*
+      public async Task Delete(long id)
+          {
+              var entity = await pizushiContext.Categories.Where(x => x.Id == id)
+                  .FirstOrDefaultAsync();
+              entity!.IsDeleted = true;
+              await pizushiContext.SaveChangesAsync();
+          }     
+     */
 }
