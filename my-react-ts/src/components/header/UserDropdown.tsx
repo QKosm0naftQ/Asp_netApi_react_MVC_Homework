@@ -1,9 +1,15 @@
 import {Dropdown} from "../ui/dropdown/Dropdown.tsx";
 import {DropdownItem} from "../ui/dropdown/DropdownItem.tsx";
-import {Link} from "react-router";
+// import {useNavigate} from "react-router-dom";
 import {useState} from "react";
+import {useAppDispatch, useAppSelector} from "../../store";
+import {logout} from "../../store/authSlice.ts";
+import {APP_ENV} from "../../env";
 
 export default function UserDropdown() {
+    const { user } = useAppSelector(state=>state.auth);
+    // const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const [isOpen, setIsOpen] = useState(false);
 
     function toggleDropdown() {
@@ -13,17 +19,24 @@ export default function UserDropdown() {
     function closeDropdown() {
         setIsOpen(false);
     }
+
+    function logoutUser() {
+        dispatch(logout());
+        // navigate('/');
+        //Перехід працює автоматично
+    }
+
     return (
         <div className="relative">
             <button
                 onClick={toggleDropdown}
                 className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
             >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
+       <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+          <img src={`${APP_ENV.IMAGES_200_URL}${user?.image}`} alt="User" />
         </span>
 
-                <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+                <span className="block mr-1 font-medium text-theme-sm">{user?.name}</span>
                 <svg
                     className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
                         isOpen ? "rotate-180" : ""
@@ -51,10 +64,10 @@ export default function UserDropdown() {
             >
                 <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {user?.name}
           </span>
                     <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {user?.email}
           </span>
                 </div>
 
@@ -135,8 +148,8 @@ export default function UserDropdown() {
                         </DropdownItem>
                     </li>
                 </ul>
-                <Link
-                    to="/signin"
+                <span
+                    onClick={logoutUser}
                     className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                 >
                     <svg
@@ -155,7 +168,7 @@ export default function UserDropdown() {
                         />
                     </svg>
                     Sign out
-                </Link>
+                </span>
             </Dropdown>
         </div>
     );
