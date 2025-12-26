@@ -1,9 +1,5 @@
 import {Card, Col, Tooltip, Image} from 'antd';
 import {APP_ENV} from "../../../env";
-import {useAppSelector} from "../../../store";
-import type {ICartItem} from "../../../store/localCartSlice.ts";
-import {useCart} from "../../../hooks/useCart.ts";
-
 
 interface Ingredient {
     id: number;
@@ -24,44 +20,11 @@ interface ProductCardProps {
     };
 }
 
-
-
 export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
     const mainImage = product.productImages?.[0]?.name;
     const ingredients = product.ingredients || [];
     const visible = ingredients.slice(0, 2);
     const hidden = ingredients.slice(2);
-    const {user} = useAppSelector(state => state.auth);
-
-    const { cart, addToCart } = useCart(user!=null);
-
-    const isInCart = cart.some(item =>
-        product && item.productId ===  product.id
-    );
-
-    // console.log("cart", cart);
-    // console.log("product", product);
-    // console.log("isInCart", isInCart);
-    const handleAddToCart = async () => {
-        if (!product) return;
-
-        console.log("product add", product);
-
-        const newItem: ICartItem = {
-            id: product.id,
-            productId: product.id,
-            quantity: 1,
-            sizeName: product.productSize?.name ?? "",
-            price: product.price,
-            imageName: product.productImages?.[0]?.name ?? "",
-            categoryId: 0,
-            categoryName: "",
-            name: product.name,
-        };
-
-        await addToCart(newItem);
-
-    };
 
     return (
         <Col xs={24} sm={12} md={8} lg={6}>
@@ -135,14 +98,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
                                     </div>
                                 </div>
                             )}
-
-                            <button className={`${
-                                isInCart ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-700"
-                            } text-white font-bold py-2 px-4 mt-5 rounded-full`}
-                                    onClick={!isInCart ? handleAddToCart : undefined}
-                            >
-                                {isInCart ? "Вже в кошику" : "В кошик"}
-                            </button>
                         </div>
                     </div>
                 </Card>

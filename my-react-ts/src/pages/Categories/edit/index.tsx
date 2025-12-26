@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router";
 import LoadingOverlay from "../../../components/ui/loading/LoadingOverlay.tsx";
 import { useFormServerErrors } from "../../../utilities/useFormServerErrors.ts";
 // import { useEffect } from "react";
+import {APP_ENV} from "../../../env";
 
 const CategoriesEditPage: React.FC = () => {
     const navigate = useNavigate();
@@ -73,8 +74,10 @@ const CategoriesEditPage: React.FC = () => {
                         <Input />
                     </Form.Item>
 
-                    <ImageUploadFormItem name="imageFile" label="Нове фото" />
-
+                    <ImageUploadFormItem name="imageFile"
+                                         label="Нове фото"
+                                         src={`${APP_ENV.IMAGES_400_URL}${category.image}`}
+                    />
                     <Form.Item label={null}>
                         <Button type="primary" htmlType="submit">
                             Змінити

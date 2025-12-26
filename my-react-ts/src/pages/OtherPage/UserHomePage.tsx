@@ -16,7 +16,7 @@ const UserHomePage: React.FC = () => {
                     Обирай улюблені страви з нашого меню та отримуй їх швидко і гарячими.
                 </p>
                 <Link
-                    to="/menu"
+                    to="/products"
                     className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold py-3 px-6 rounded-lg shadow-lg transition"
                 >
                     Переглянути меню

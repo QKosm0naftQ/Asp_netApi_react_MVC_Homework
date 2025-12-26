@@ -6,7 +6,7 @@ import LoadingOverlay from "../../../components/ui/loading/LoadingOverlay.tsx";
 import ImageUploadFormItem from "../../../components/ui/form/ImageUploadFormItem.tsx";
 import {loginSuccess} from "../../../store/authSlice.ts";
 import {useDispatch} from "react-redux";
-import {useRegisterMutation} from "../../../services/apiAccount.tsx";
+import {useRegisterMutation} from "../../../services/apiAccount.ts";
 
 const RegistrationPage: React.FC = () => {
 

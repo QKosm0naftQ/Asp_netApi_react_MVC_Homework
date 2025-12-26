@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Form, type FormProps, Input } from 'antd';
-import {type ILoginRequest, useLoginMutation} from "../../../services/apiAccount.tsx";
+import {type ILoginRequest, useLoginMutation} from "../../../services/apiAccount.ts";
 import {getUserFromToken, loginSuccess} from "../../../store/authSlice.ts";
 import {useAppDispatch} from "../../../store";
+
+import { useGoogleLogin } from '@react-oauth/google';
 
 
 const LoginPage: React.FC = () => {
@@ -29,7 +31,9 @@ const LoginPage: React.FC = () => {
             alert("Login failed");
         }
     };
-
+    const loginUseGoogle = useGoogleLogin({
+        onSuccess: tokenResponse => console.log(tokenResponse),
+    })
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-300">
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
@@ -60,6 +64,16 @@ const LoginPage: React.FC = () => {
                     >
                         {isLoading ? 'Logging in...' : 'Login'}
                     </button>
+                    <button
+                        onClick={(event) =>  {
+                            event.preventDefault();
+                            loginUseGoogle();
+                        }}
+                        className="bg-blue-500 hover:bg-blue-600 transition text-white font-semibold px-4 py-2 rounded w-full mt-4"
+                    >
+                        {'LoginGoogle'}
+                    </button>             
+                                        
                 </Form>
             </div>
         </div>
