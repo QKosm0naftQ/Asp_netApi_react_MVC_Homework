@@ -60,6 +60,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 //Щоб отримати доступ до HttpContext в сервісах
 builder.Services.AddHttpContextAccessor();
 //
