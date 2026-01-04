@@ -1,6 +1,6 @@
 namespace Core.SMTP;
 
-public class Message
+public class EmailMessage
 {
     /// <summary>
     /// Тема листа
