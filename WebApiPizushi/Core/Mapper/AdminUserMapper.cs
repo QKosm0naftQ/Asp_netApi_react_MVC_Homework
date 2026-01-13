@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Models.Account;
+using Core.Models.AdminUser;
 using Domain.Entities.Identity;
 
 namespace Core.Mapper;

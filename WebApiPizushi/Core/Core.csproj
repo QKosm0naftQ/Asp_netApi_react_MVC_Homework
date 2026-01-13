@@ -32,4 +32,10 @@
       <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Microsoft.CodeAnalysis.Elfie">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.codeanalysis.elfie\1.0.0\lib\netstandard2.0\Microsoft.CodeAnalysis.Elfie.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

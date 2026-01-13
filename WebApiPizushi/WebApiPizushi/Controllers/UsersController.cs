@@ -1,4 +1,5 @@
 using Core.Interface;
+using Core.Models.Search.Params;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApiPizushi.Controllers;
@@ -13,5 +14,11 @@ public class UsersController(IUserService userService) : Controller
         var model = await userService.GetAllUsersAsync();
 
         return Ok(model);
+    }
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchUsers([FromQuery] UserSearchModel model)
+    {
+        var result = await userService.SearchUsersAsync(model);
+        return Ok(result);
     }
 }
