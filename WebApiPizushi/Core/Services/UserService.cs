@@ -79,35 +79,14 @@ public class UserService(UserManager<UserEntity> userManager,
             query = query.Where(u => u.DateCreated <= model.EndDate);
         }
 
-        //if (model.Roles != null && model.Roles.Any())
-        //{
-        //    var validRoles = model.Roles.Where(role => role != null);
-
-        //    if (validRoles != null && validRoles.Count() > 0)
-        //    {
-        //        var usersInRole = (await Task.WhenAll(
-        //            model.Roles.Select(role => userManager.GetUsersInRoleAsync(role))
-        //        )).SelectMany(u => u).ToList();
-
-        //        var userIds = usersInRole.Select(u => u.Id).ToHashSet();
-
-        //        query = query.Where(u => userIds.Contains(u.Id));
-        //    }
-        //}
-
         if (model.Roles != null && model.Roles.Any())
         {
-            query = query.Where(user => model.Roles.Any(role => user.UserRoles.Select(x=>x.Role.Name).Contains(role)));
+            var roles = model.Roles.Where(x=>!string.IsNullOrEmpty(x));
+            if(roles.Count() > 0)
+                query = query.Where(user => roles.Any(role => user.UserRoles.Select(x=>x.Role.Name).Contains(role)));
         }
 
-            //if (searchParams?.Roles.Count > 0)
-            //{
-            //    users = users.Where(user => searchParams.Roles.Any(role => user.Roles.Contains(role))
-            //    ).ToList();
-            //}
-
-
-            var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync();
 
         var safeItemsPerPage = model.ItemPerPAge < 1 ? 10 : model.ItemPerPAge;
         var totalPages = (int)Math.Ceiling(totalCount / (double)safeItemsPerPage);
@@ -193,34 +172,5 @@ public class UserService(UserManager<UserEntity> userManager,
             ts.Milliseconds / 10);
 
         return elapsedTime;
-    }
-
-    private async Task LoadLoginsAndRolesAsync(List<AdminUserItemModel> users)
-    {
-        await context.UserLogins.ForEachAsync(login =>
-        {
-            var user = users.FirstOrDefault(u => u.Id == login.UserId);
-            if (user != null)
-            {
-                user.LoginTypes.Add(login.LoginProvider);
-            }
-        });
-
-        var identityUsers = await userManager.Users.AsNoTracking().ToListAsync();
-
-        foreach (var identityUser in identityUsers) // Забрав foreachAsync через конфлікнт з userManager.GetRolesAsync(identityUser)
-        {
-            var adminUser = users.FirstOrDefault(u => u.Id == identityUser.Id);
-            if (adminUser != null)
-            {
-                var roles = await userManager.GetRolesAsync(identityUser);
-                adminUser.Roles = roles.ToList();
-
-                if (!string.IsNullOrEmpty(identityUser.PasswordHash))
-                {
-                    adminUser.LoginTypes.Add("Password");
-                }
-            }
-        }
     }
 }
