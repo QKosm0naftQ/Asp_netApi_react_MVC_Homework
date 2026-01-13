@@ -7,7 +7,7 @@ using Domain.Entities;
 using Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WebApiPizushi.Constants;
+using Core.Constants;
 
 
 namespace WebApiPizushi;

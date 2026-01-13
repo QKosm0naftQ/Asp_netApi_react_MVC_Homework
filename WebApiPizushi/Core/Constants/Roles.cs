@@ -1,4 +1,4 @@
-namespace WebApiPizushi.Constants;
+namespace Core.Constants;
 
 public class Roles
 {

@@ -8,4 +8,6 @@ public class AdminUserItemModel
     public string Email { get; set; } = string.Empty;
     public string Image { get; set; } = string.Empty;
     public List<string> LoginTypes { get; set; } = new();
+    public bool IsLoginPassword { get; set; } = false;
+    public bool IsLoginGoogle { get; set; } = false;
 }
