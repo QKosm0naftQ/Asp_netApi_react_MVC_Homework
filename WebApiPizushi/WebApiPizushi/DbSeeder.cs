@@ -1,14 +1,14 @@
-﻿using System.Text.Json;
-using AutoMapper;
+﻿using AutoMapper;
+using Core.Constants;
 using Core.Interface;
 using Core.Models.Seeder;
 using Domain;
 using Domain.Entities;
+using Domain.Entities.Delivery;
 using Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Core.Constants;
-
+using System.Text.Json;
 
 namespace WebApiPizushi;
 
@@ -18,9 +18,9 @@ public static class DbSeeder
     {
         using var scope = webApplication.Services.CreateScope();
         //Цей об'єкт буде верта посилання на конткетс, який зараєстрвоано в Progran.cs
+        var context = scope.ServiceProvider.GetRequiredService<AppDbPizushiContext>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<RoleEntity>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbPizushiContext>();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
         context.Database.Migrate();
@@ -56,7 +56,7 @@ public static class DbSeeder
                 Console.WriteLine("Not Found File Categories.json");
             }
         }
-        
+
         if (!context.Ingredients.Any())
         {
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
@@ -88,7 +88,7 @@ public static class DbSeeder
                 Console.WriteLine("Not Found File Ingredients.json");
             }
         }
-        
+
         if (!context.ProductSizes.Any())
         {
             var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "ProductSizes.json");
@@ -113,7 +113,7 @@ public static class DbSeeder
                 Console.WriteLine("Not Found File ProductSizes.json");
             }
         }
-        
+
         if (context.Products.Count()==0)
         {
             var сaesar = new ProductEntity
@@ -164,12 +164,11 @@ public static class DbSeeder
                 {
                     Console.WriteLine("Error Save Image {0} - {1}", imageUrl, ex.Message);
                 }
-
             }
             await context.SaveChangesAsync();
 
         }
-        
+
         if (context.Products.Count() == 1)
         {
             var сaesar = new ProductEntity
@@ -223,63 +222,8 @@ public static class DbSeeder
             await context.SaveChangesAsync();
 
         }
-        
-        if (context.Products.Count() == 2)
-        {
-            var Franchesko = new ProductEntity
-            {
-                Name = "Франческо",
-                Slug = "Franchesko",
-                Price = 355,
-                Weight = 1080,
-                CategoryId = 1, // Assuming the first category is for Caesar
-                ProductSizeId = 1 // Assuming the first size is for Caesar
-            };
 
-            context.Products.Add(Franchesko);
-            await context.SaveChangesAsync();
 
-            var ingredients = context.Ingredients.ToList();
-
-            foreach (var ingredient in ingredients)
-            {
-                var productIngredient = new ProductIngredientEntity
-                {
-                    ProductId = Franchesko.Id,
-                    IngredientId = ingredient.Id
-                };
-                context.ProductIngredients.Add(productIngredient);
-            }
-
-            await context.SaveChangesAsync();
-
-            string[] images =
-            {
-                "https://kingpizza.kh.ua/resources/products/20210810115749_ca6b6cbe9b.jpg",
-                "https://kvadratsushi.com/wp-content/uploads/2020/06/chezar_1200x800.jpg"
-            };
-
-            var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
-            foreach (var imageUrl in images)
-            {
-                try
-                {
-                    var productImage = new ProductImageEntity
-                    {
-                        ProductId = Franchesko.Id,
-                        Name = await imageService.SaveImageFromUrlAsync(imageUrl)
-                    };
-                    context.ProductImages.Add(productImage);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error Save Image {0} - {1}", imageUrl, ex.Message);
-                }
-            }
-
-            await context.SaveChangesAsync();
-        }
-        
         if (!context.Roles.Any())
         {
             foreach (var roleName in Roles.AllRoles)
@@ -291,7 +235,7 @@ public static class DbSeeder
                 }
             }
         }
-        
+
         if (!context.Users.Any())
         {
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
@@ -337,8 +281,7 @@ public static class DbSeeder
                 Console.WriteLine("Not Found File Users.json");
             }
         }
-        
-        // --------
+
         if (!context.OrderStatuses.Any())
         {
             List<string> names = new List<string>() {
@@ -415,8 +358,47 @@ public static class DbSeeder
 
             await context.SaveChangesAsync();
         }
-        
 
+        if (!context.Cities.Any())
+        {
+            var list = new List<CityEntity>
+            {
+                new CityEntity { Name = "Київ" },
+                new CityEntity { Name = "Львів" },
+                new CityEntity { Name = "Одеса" },
+                new CityEntity { Name = "Харків" },
+                new CityEntity { Name = "Дніпро" }
+            };
 
+            await context.Cities.AddRangeAsync(list);
+            await context.SaveChangesAsync();
+        }
+
+        if (!context.PostDepartments.Any())
+        {
+            var list = new List<PostDepartmentEntity>
+            {
+                new PostDepartmentEntity { Name = "Відділення №1" },
+                new PostDepartmentEntity { Name = "Відділення №2" },
+                new PostDepartmentEntity { Name = "Відділення №3" },
+                new PostDepartmentEntity { Name = "Відділення №4" },
+                new PostDepartmentEntity { Name = "Відділення №5" }
+            };
+
+            await context.PostDepartments.AddRangeAsync(list);
+            await context.SaveChangesAsync();
+        }
+
+        if (!context.PaymentTypes.Any())
+        {
+            var list = new List<PaymentTypeEntity>
+            {
+                new PaymentTypeEntity { Name = "Готівка" },
+                new PaymentTypeEntity { Name = "Картка" }
+            };
+
+            await context.PaymentTypes.AddRangeAsync(list);
+            await context.SaveChangesAsync();
+        }
     }
 }

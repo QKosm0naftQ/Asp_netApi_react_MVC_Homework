@@ -3,7 +3,7 @@ using Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using Domain.Entities.Delivery;
 namespace Domain;
 
 public class AppDbPizushiContext : IdentityDbContext<UserEntity, RoleEntity, long,
@@ -25,7 +25,13 @@ public class AppDbPizushiContext : IdentityDbContext<UserEntity, RoleEntity, lon
     public DbSet<OrderItemEntity> OrderItems { get; set; }
 
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    public DbSet<CityEntity> Cities { get; set; }
+    public DbSet<PostDepartmentEntity> PostDepartments { get; set; }
+    public DbSet<PaymentTypeEntity> PaymentTypes { get; set; }
+
+    public DbSet<DeliveryInfoEntity> DeliveryInfos { get; set; }
+  
+  protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
         builder.Entity<UserRoleEntity>(ur =>

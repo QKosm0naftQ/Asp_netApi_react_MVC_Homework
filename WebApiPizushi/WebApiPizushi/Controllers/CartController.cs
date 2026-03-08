@@ -17,16 +17,26 @@ namespace WebApiPizushi.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetItems()
+        public async Task<IActionResult> GetCart()
         {
             var model =  await cartService.GetCartItems();
             return Ok(model);
         }
         
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> RemoveCartItem(long id)
         {
             await cartService.Delete(id);
+            return Ok();
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddRange([FromBody] List<CartCreateUpdateModel> modelItems)
+        {
+            foreach (var item in modelItems)
+            {
+                await cartService.CreateUpdate(item);
+            }
             return Ok();
         }
     }
