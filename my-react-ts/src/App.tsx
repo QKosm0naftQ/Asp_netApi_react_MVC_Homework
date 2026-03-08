@@ -1,69 +1,82 @@
+import React from "react";
 import './App.css'
 import { BrowserRouter as Router, Route, Routes } from "react-router";
-import UserLayout from "./layout/user/UserLayout.tsx";
-import UserHomePage from "./pages/OtherPage/UserHomePage.tsx";
-import AdminLayout from "./layout/admin/AdminLayout.tsx";
-import DashboardHome from "./pages/Dashboard/DashboardHome.tsx";
-import CategoriesListPage from "./pages/Categories";
-import NotFound from "./pages/OtherPage/NotFound.tsx";
-import CategoriesCreatePage from "./pages/Categories/create";
-import CategoriesEditPage from "./pages/Categories/edit";
-import LoginPage from "./pages/Account/Login";
+// Layouts
+const UserLayout = React.lazy(() => import("./layout/user/UserLayout.tsx"));
+const AdminLayout = React.lazy(() => import("./layout/admin/AdminLayout.tsx"));
+
+// Pages
+const UserHomePage = React.lazy(() => import("./pages/OtherPage/UserHomePage.tsx"));
+const DashboardHome = React.lazy(() => import("./pages/Dashboard/DashboardHome.tsx"));
+const NotFound = React.lazy(() => import("./pages/OtherPage/NotFound.tsx"));
+
+const CategoriesListPage = React.lazy(() => import("./pages/Categories"));
+const CategoriesCreatePage = React.lazy(() => import("./pages/Categories/create"));
+const CategoriesEditPage = React.lazy(() => import("./pages/Categories/edit"));
+
+const LoginPage = React.lazy(() => import("./pages/Account/Login"));
+const RegistrationPage = React.lazy(() => import("./pages/Account/register"));
+const ForgotPasswordPage = React.lazy(() => import("./pages/Account/ForgotPassword"));
+const ForgotSuccessPage = React.lazy(() => import("./pages/Account/ForgotSuccess.tsx"));
+const ResetPasswordPage = React.lazy(() => import("./pages/Account/ResetPassword/index.tsx"));
+
+const ProductsPage = React.lazy(() => import("./pages/Products/List"));
+const AdminProductListPage = React.lazy(() => import("./admin/pages/Products/List/AdminProductListPage.tsx"));
+const AdminProductCreatePage = React.lazy(() => import("./admin/pages/Products/Create/AdminProductCreatePage.tsx"));
+const UserListPage = React.lazy(() => import("./admin/pages/Users"));
+
+// Components
 import RequireAdmin from "./components/ProtectedRoute/RequireAdmin.tsx";
-import RegistrationPage from "./pages/Account/register";
-import ProductsPage from "./pages/Products/List";
 
-import AdminProductListPage from "./admin/pages/Products/List/AdminProductListPage.tsx";
-import AdminProductCreatePage from "./admin/pages/Products/Create/AdminProductCreatePage.tsx";
 
-import ForgotPasswordPage from "./pages/Account/ForgotPassword";
-
-import ForgotSuccessPage from "./pages/Account/ForgotSuccess.tsx";
-import { ResetPasswordPage } from "./pages/Account/ResetPassword";
-
-import UserListPage from "./admin/pages/Users";
 
 const App: React.FC = () => {
 
   return (
     <>
       <Router>
-        <Routes>
-          {/*<Route index element={<UserLayout>}></Route>*/}
+        <React.Suspense fallback={<div>Завантаження...</div>}>
+          <Routes>
+            {/*<Route index element={<UserLayout>}></Route>*/}
 
-          <Route path="/" element={<UserLayout />}>
-            <Route index element={<UserHomePage />} />
-            <Route path={'login'} element={<LoginPage />} />
-            <Route path={'forgot-password'} element={<ForgotPasswordPage />} />
-            <Route path="forgot-success" element={<ForgotSuccessPage />} />
-            <Route path="reset-password" element={<ResetPasswordPage />} />
-            <Route path="register" element={<RegistrationPage />} />
-            <Route path="products" element={<ProductsPage />} />
-          </Route>
+            <Route path="/" element={<UserLayout />}>
+              <Route index element={<UserHomePage />} />
 
-          <Route path="admin" element={<RequireAdmin />}>
-            <Route element={<AdminLayout />}>
-              <Route path="home" element={<DashboardHome />} />
+              {/*<Route path={'login'} element={<LoginPage/>} />*/}
+              <Route path={'login'} element={<LoginPage />} />
+              <Route path={'forgot-password'} element={<ForgotPasswordPage />} />
+              <Route path="forgot-success" element={<ForgotSuccessPage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
+              <Route path="register" element={<RegistrationPage />} />
+              <Route path="products" element={<ProductsPage />} />
+            </Route>
 
-              <Route path="categories">
-                <Route index element={<CategoriesListPage />} />
-                <Route path={'create'} element={<CategoriesCreatePage />} />
-                <Route path={'edit/:id'} element={<CategoriesEditPage />} />
-              </Route>
+            <Route path="admin" element={<RequireAdmin />}>
+              <Route element={<AdminLayout />}>
+                <Route path="home" element={<DashboardHome />} />
 
-              <Route path="products">
-                <Route index element={<AdminProductListPage />} />
-                <Route path={'create'} element={<AdminProductCreatePage />} />
-              </Route>
-              <Route path="users">
-                <Route index element={<UserListPage />}></Route>
+                <Route path="categories">
+                  <Route index element={<CategoriesListPage />} />
+                  <Route path={'create'} element={<CategoriesCreatePage />} />
+                  <Route path={'edit/:id'} element={<CategoriesEditPage />} />
+                </Route>
+
+                <Route path="products">
+                  <Route index element={<AdminProductListPage />} />
+                  <Route path={'create'} element={<AdminProductCreatePage />} />
+                </Route>
+
+                <Route path="users">
+                  <Route index element={<UserListPage />}></Route>
+                </Route>
+
               </Route>
             </Route>
-          </Route>
 
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </React.Suspense>
       </Router>
     </>
   )

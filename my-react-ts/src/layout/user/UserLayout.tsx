@@ -1,21 +1,24 @@
 import { Link, Outlet } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../store";
-//import {useNavigate} from "react-router-dom";
+// import {useNavigate} from "react-router-dom";
 import { logout } from "../../store/authSlice.ts";
-import { Button } from "antd";
+import { Badge, Button } from "antd";
 import { APP_ENV } from "../../env";
 
 const UserLayout: React.FC = () => {
   const { user } = useAppSelector(state => state.auth);
+  const { items } = useAppSelector(state => state.cart);
+
   const dispatch = useAppDispatch();
-  //const navigate = useNavigate();
-  //    function logoutUser() {
-  //      // console.log("logoutUser");
-  //    dispatch(logout());
-  //  navigate('/');
+  // const navigate = useNavigate();
+  // function logoutUser() {
+  //     // console.log("logoutUser");
+  //     dispatch(logout());
+  //     navigate('/');
+  //
+  // }
 
-  //}
-
+  console.log("items", items);
 
 
   return (
@@ -23,49 +26,54 @@ const UserLayout: React.FC = () => {
       <header className="w-full py-4 px-6 bg-orange-500 text-white shadow-md flex justify-between">
         <h1 className="text-xl font-semibold">FoodDelivery</h1>
 
-        {user ? (
-          <div className="flex items-center gap-4">
-            <Link to="/account" className="flex items-center gap-2">
-              <img
-                src={user.image ? `${APP_ENV.IMAGES_50_URL}${user.image}` : '/images/user/default.png'}
-                alt={user.name}
-                className="w-10 h-10 rounded-full border-2 border-white object-cover"
-              />
-              <span className="font-medium">{user.name}</span>
-            </Link>
+        <div className="flex items-center gap-4">
+          <Badge count={items.length} showZero>
+            <Button>Кошик</Button>
+          </Badge>
+          {user ? (
+            <>
+              <Link to="/account" className="flex items-center gap-2">
+                <img
+                  src={user.image ? `${APP_ENV.IMAGES_50_URL}${user.image}` : '/images/user/default.png'}
+                  alt={user.name}
+                  className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                />
+                <span className="font-medium">{user.name}</span>
+              </Link>
 
-            <Link
-              to="/admin/home"
-              className="bg-white text-orange-500 px-3 py-1 rounded hover:bg-orange-100 transition"
-            >
-              Адмінка
-            </Link>
+              <Link
+                to="/admin/home"
+                className="bg-white text-orange-500 px-3 py-1 rounded hover:bg-orange-100 transition"
+              >
+                Адмінка
+              </Link>
 
 
-            <Button
-              onClick={() => dispatch(logout())}
-              className="bg-white text-orange-500 border-none hover:bg-orange-100"
-            >
-              Вихід
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-4">
-            <Link
-              to="login"
-              className="bg-white text-orange-500 px-4 py-2 rounded hover:bg-orange-100 transition"
-            >
-              Вхід
-            </Link>
+              <Button
+                onClick={() => dispatch(logout())}
+                className="bg-white text-orange-500 border-none hover:bg-orange-100"
+              >
+                Вихід
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="login"
+                className="bg-white text-orange-500 px-4 py-2 rounded hover:bg-orange-100 transition"
+              >
+                Вхід
+              </Link>
 
-            <Link
-              to="register"
-              className="bg-white text-orange-500 px-4 py-2 rounded hover:bg-orange-100 transition"
-            >
-              Реєстрація
-            </Link>
-          </div>
-        )}
+              <Link
+                to="register"
+                className="bg-white text-orange-500 px-4 py-2 rounded hover:bg-orange-100 transition"
+              >
+                Реєстрація
+              </Link>
+            </>
+          )}
+        </div>
 
       </header>
 
