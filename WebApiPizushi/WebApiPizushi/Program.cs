@@ -25,7 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbPizushiContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Аутинфикація 
-
+builder.Services.AddHttpClient();
 builder.Services.AddIdentityConfiguration();
 
 builder.Services.AddAuthentication(options =>
@@ -63,6 +63,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ISmtpService, SmtpService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<INovaPoshtaService, NovaPoshtaService>();
+
 //Щоб отримати доступ до HttpContext в сервісах
 builder.Services.AddHttpContextAccessor();
 //
