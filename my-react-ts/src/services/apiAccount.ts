@@ -71,7 +71,7 @@ export const apiAccount = createApi({
 
 
     }),
-    loginByGoogle: builder.mutation<IAuthResponse, string>({
+    loginByGoogle: builder.mutation<IAuthResponse, string>({// work 
       query: (token) => ({
         url: 'googleLogin',
         method: 'POST',
