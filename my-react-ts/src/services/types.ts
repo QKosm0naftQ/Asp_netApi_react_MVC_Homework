@@ -91,7 +91,7 @@ export interface IAdminUserItem {
   fullName: string;
   email: string;
   image: string;
-  dateCreated: string;
+  dateCreated?: string;
   roles: string[];
   loginTypes: string[];
 }

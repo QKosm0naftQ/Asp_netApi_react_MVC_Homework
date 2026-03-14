@@ -11,24 +11,27 @@ using Microsoft.Extensions.Configuration;
 
 namespace Core.Services;
 
-public class AccountService(IJwtTokenService tokenService,
+public class AccountService(
+    IJwtTokenService tokenService,
     UserManager<UserEntity> userManager,
     IMapper mapper,
     IConfiguration configuration,
     IImageService imageService,
     ISmtpService smtpService
-    ) : IAccountService
+) : IAccountService
 {
-
     public async Task<string> LoginByGoogle(string token)
     {
         using var httpClient = new HttpClient();
 
-        httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            token
+        );
 
         //configuration
-        string userInfo = configuration["GoogleUserInfo"] ?? "https://www.googleapis.com/oauth2/v2/userinfo";
+        string userInfo =
+            configuration["GoogleUserInfo"] ?? "https://www.googleapis.com/oauth2/v2/userinfo";
         var response = await httpClient.GetAsync(userInfo);
 
         if (!response.IsSuccessStatusCode)
@@ -45,7 +48,10 @@ public class AccountService(IJwtTokenService tokenService,
 
             if (userLoginGoogle == null)
             {
-                await userManager.AddLoginAsync(existingUser, new UserLoginInfo("Google", googleUser.GogoleId, "Google"));
+                await userManager.AddLoginAsync(
+                    existingUser,
+                    new UserLoginInfo("Google", googleUser.GogoleId, "Google")
+                );
             }
             var jwtToken = await tokenService.CreateTokenAsync(existingUser);
             return jwtToken;
@@ -62,12 +68,14 @@ public class AccountService(IJwtTokenService tokenService,
             var result = await userManager.CreateAsync(user);
             if (result.Succeeded)
             {
-
-                result = await userManager.AddLoginAsync(user, new UserLoginInfo(
-                    loginProvider: "Google",
-                    providerKey: googleUser.GogoleId,
-                    displayName: "Google"
-                ));
+                result = await userManager.AddLoginAsync(
+                    user,
+                    new UserLoginInfo(
+                        loginProvider: "Google",
+                        providerKey: googleUser.GogoleId,
+                        displayName: "Google"
+                    )
+                );
 
                 await userManager.AddToRoleAsync(user, "User");
                 var jwtToken = await tokenService.CreateTokenAsync(user);
@@ -77,23 +85,26 @@ public class AccountService(IJwtTokenService tokenService,
 
         return string.Empty;
     }
+
     public async Task<bool> ForgotPasswordAsync(ForgotPasswordModel model)
     {
         var user = await userManager.FindByEmailAsync(model.Email);
-
+        Console.WriteLine("-------Данні про пошту:" + user.Email);
         if (user == null)
         {
             return false;
         }
 
         string token = await userManager.GeneratePasswordResetTokenAsync(user);
-        var resetLink = $"{configuration["ClientUrl"]}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(model.Email)}";
+        var resetLink =
+            $"{configuration["ClientUrl"]}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(model.Email)}";
 
         var emailModel = new EmailMessage
         {
             To = model.Email,
             Subject = "Password Reset",
-            Body = $"<p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>"
+            Body =
+                $"<p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>",
         };
 
         var result = await smtpService.SendEmailAsync(emailModel);
@@ -109,7 +120,8 @@ public class AccountService(IJwtTokenService tokenService,
             user,
             TokenOptions.DefaultProvider,
             "ResetPassword",
-            model.Token);
+            model.Token
+        );
     }
 
     public async Task ResetPasswordAsync(ResetPasswordModel model)
@@ -119,5 +131,5 @@ public class AccountService(IJwtTokenService tokenService,
         if (user != null)
             await userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
     }
-
 }
+
