@@ -116,3 +116,15 @@ export interface IUserSearchParams {
   startDate?: string;
   endDate?: string;
 }
+
+export interface IProductEdit {
+  id: number;           // Обов'язково для PUT запиту
+  name: string;
+  slug: string;
+  price: number;
+  weight: number;
+  categoryId: number;
+  productSizeId: number;
+  ingredientIds?: number[];
+  imageFiles?: File[];  // Необов'язково (тільки якщо міняємо фото)
+}

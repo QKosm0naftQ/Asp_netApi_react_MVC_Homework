@@ -27,6 +27,7 @@ const UserListPage = React.lazy(() => import("./admin/pages/Users"));
 
 // Components
 import RequireAdmin from "./components/ProtectedRoute/RequireAdmin.tsx";
+import AdminProductEditPage from "./admin/pages/Products/Edit/AdminProductEditPage.tsx";
 
 
 
@@ -64,6 +65,7 @@ const App: React.FC = () => {
                 <Route path="products">
                   <Route index element={<AdminProductListPage />} />
                   <Route path={'create'} element={<AdminProductCreatePage />} />
+                  <Route path="edit/:id" element={<AdminProductEditPage />} />
                 </Route>
 
                 <Route path="users">
