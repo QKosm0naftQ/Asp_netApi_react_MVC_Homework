@@ -8,9 +8,10 @@ import { CloseCircleFilled, EditOutlined } from "@ant-design/icons";
 
 interface UserTableItemProps {
   user: IAdminUserItem;
+  onEdit: () => void;
 }
 
-const UserTableItem: React.FC<UserTableItemProps> = ({ user }) => {
+const UserTableItem: React.FC<UserTableItemProps> = ({ user, onEdit }) => {
   // Безпечне форматування дати
   const formatDate = (dateString?: string) => {
     if (!dateString) return <span className="text-gray-400 italic text-xs">—</span>;
@@ -83,13 +84,12 @@ const UserTableItem: React.FC<UserTableItemProps> = ({ user }) => {
       {/* 8. Action */}
       <TableCell className="py-3">
         <Space size="small">
-          <Link to={`edit/${user.id}`}>
-            <Button
-              size="small"
-              icon={<EditOutlined />}
-              className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-            />
-          </Link>
+          <Button
+            size="small"
+            icon={<EditOutlined />}
+            onClick={onEdit}
+            className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          />
           <Button
             size="small"
             danger

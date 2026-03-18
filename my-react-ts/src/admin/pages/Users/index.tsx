@@ -14,11 +14,19 @@ import dayjs from 'dayjs';
 import type { IUserSearchParams } from "../../../services/types.ts";
 const { RangePicker } = DatePicker;
 
+import EditUserModal from "./Edit/index.tsx";
+
 const ITEMS_PER_PAGE = 10;
 
 const UserListPage: React.FC = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
+  const handleEditClick = (id: number) => {
+    setSelectedUserId(id);
+    setIsEditModalOpen(true);
+  };
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -219,11 +227,23 @@ const UserListPage: React.FC = () => {
 
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {users.map(user => (
-                <UserTableItem key={user.id} user={user} />
+                <UserTableItem key={user.id} user={user}
+                  onEdit={() => handleEditClick(user.id)}
+                />
               ))}
             </TableBody>
           </Table>
         </div>
+        {selectedUserId && (
+          <EditUserModal
+            userId={selectedUserId}
+            open={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setSelectedUserId(null);
+            }}
+          />
+        )}
 
         {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-center mt-6 gap-2 flex-wrap text-sm text-gray-700 dark:text-gray-300">

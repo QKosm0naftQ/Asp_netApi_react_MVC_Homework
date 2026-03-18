@@ -79,7 +79,7 @@ const App: React.FC = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </React.Suspense>
-      </Router>
+      </Router >
     </>
   )
 }
