@@ -1,0 +1,19 @@
+#Ігнор з WebProgram
+WebProgram/bin/
+WebProgram/obj/
+
+#Ігнор з WebApiPizushi
+WebApiPizushi/WebApiPizushi/bin/
+WebApiPizushi/WebApiPizushi/obj/
+
+WebApiPizushi/Core/bin/
+WebApiPizushi/Core/obj/
+
+WebApiPizushi/Domain/bin/
+WebApiPizushi/Domain/obj/
+
+#Ігнор з my-pizushi
+my-pizushi/node_modules/
+
+#Ігнор архіву
+ArhiveProject/

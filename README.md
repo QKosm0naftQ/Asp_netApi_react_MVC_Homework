@@ -1,4 +1,4 @@
-# В мене WebProgram це і є WebSmonder просто інша назва
+# В мене WebProgram це і є WebSmonder просто інша назва - test
 # Run app
 ```
 dos2unix docker_pizushi.sh

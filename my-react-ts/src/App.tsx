@@ -1,6 +1,8 @@
 import React from "react";
-import './App.css'
-import { BrowserRouter as Router, Route, Routes } from "react-router";
+import './App.css';
+// ВАЖЛИВО: імпортуємо BrowserRouter, Route, Routes з 'react-router-dom'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 // Layouts
 const UserLayout = React.lazy(() => import("./layout/user/UserLayout.tsx"));
 const AdminLayout = React.lazy(() => import("./layout/admin/AdminLayout.tsx"));
@@ -29,59 +31,49 @@ const UserListPage = React.lazy(() => import("./admin/pages/Users"));
 import RequireAdmin from "./components/ProtectedRoute/RequireAdmin.tsx";
 import AdminProductEditPage from "./admin/pages/Products/Edit/AdminProductEditPage.tsx";
 
-
-
 const App: React.FC = () => {
-
   return (
-    <>
-      <Router>
-        <React.Suspense fallback={<div>Завантаження...</div>}>
-          <Routes>
-            {/*<Route index element={<UserLayout>}></Route>*/}
+    // Використовуємо BrowserRouter з пропом basename
+    <BrowserRouter basename="/pizushi">
+      <React.Suspense fallback={<div>Завантаження...</div>}>
+        <Routes>
+          {/* Секція для користувачів */}
+          <Route path="/" element={<UserLayout />}>
+            <Route index element={<UserHomePage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="forgot-success" element={<ForgotSuccessPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
+            <Route path="register" element={<RegistrationPage />} />
+            <Route path="products" element={<ProductsPage />} />
+          </Route>
 
-            <Route path="/" element={<UserLayout />}>
-              <Route index element={<UserHomePage />} />
-
-              {/*<Route path={'login'} element={<LoginPage/>} />*/}
-              <Route path={'login'} element={<LoginPage />} />
-              <Route path={'forgot-password'} element={<ForgotPasswordPage />} />
-              <Route path="forgot-success" element={<ForgotSuccessPage />} />
-              <Route path="reset-password" element={<ResetPasswordPage />} />
-              <Route path="register" element={<RegistrationPage />} />
-              <Route path="products" element={<ProductsPage />} />
-            </Route>
-
-            <Route path="admin" element={<RequireAdmin />}>
-              <Route element={<AdminLayout />}>
-                <Route path="home" element={<DashboardHome />} />
-
-                <Route path="categories">
-                  <Route index element={<CategoriesListPage />} />
-                  <Route path={'create'} element={<CategoriesCreatePage />} />
-                  <Route path={'edit/:id'} element={<CategoriesEditPage />} />
-                </Route>
-
-                <Route path="products">
-                  <Route index element={<AdminProductListPage />} />
-                  <Route path={'create'} element={<AdminProductCreatePage />} />
-                  <Route path="edit/:id" element={<AdminProductEditPage />} />
-                </Route>
-
-                <Route path="users">
-                  <Route index element={<UserListPage />}></Route>
-                </Route>
-
+          {/* Секція для адмінів */}
+          <Route path="admin" element={<RequireAdmin />}>
+            <Route element={<AdminLayout />}>
+              <Route path="home" element={<DashboardHome />} />
+              <Route path="categories">
+                <Route index element={<CategoriesListPage />} />
+                <Route path="create" element={<CategoriesCreatePage />} />
+                <Route path="edit/:id" element={<CategoriesEditPage />} />
+              </Route>
+              <Route path="products">
+                <Route index element={<AdminProductListPage />} />
+                <Route path="create" element={<AdminProductCreatePage />} />
+                <Route path="edit/:id" element={<AdminProductEditPage />} />
+              </Route>
+              <Route path="users">
+                <Route index element={<UserListPage />} />
               </Route>
             </Route>
+          </Route>
 
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </React.Suspense>
-      </Router >
-    </>
-  )
+          {/* 404 сторінка */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </React.Suspense>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
