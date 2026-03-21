@@ -1,8 +1,11 @@
+using System.Diagnostics;
+using System.Text.Json;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Bogus;
 using Core.Constants;
 using Core.Interface;
+using Core.Models;
 using Core.Models.AdminUser;
 using Core.Models.Search;
 using Core.Models.Search.Params;
@@ -12,22 +15,56 @@ using Domain.Entities.Identity;
 using MailKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Text.Json;
 using static Bogus.DataSets.Name;
 
 namespace Core.Services;
 
-public class UserService(UserManager<UserEntity> userManager,
+public class UserService(
+    UserManager<UserEntity> userManager,
     IMapper mapper,
     IImageService imageService,
     RoleManager<RoleEntity> roleManager,
-    AppDbPizushiContext context) : IUserService
+    AppDbPizushiContext context
+) : IUserService
 {
+    public async Task<AdminUserItemModel> GetByIdAsync(long id)
+    {
+        // Отримуємо базові дані через AutoMapper
+        var user = await userManager
+            .Users.Where(u => u.Id == id)
+            .ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+            return null;
+
+        // Довантажуємо типи логінів (Google, Facebook тощо)
+        var logins = await context
+            .UserLogins.Where(l => l.UserId == id)
+            .Select(l => l.LoginProvider)
+            .ToListAsync();
+
+        user.LoginTypes.AddRange(logins);
+
+        // Перевіряємо наявність пароля (як у вашому списку)
+        var entity = await userManager.FindByIdAsync(id.ToString());
+        if (entity != null && !string.IsNullOrEmpty(entity.PasswordHash))
+        {
+            if (!user.LoginTypes.Contains("Password"))
+                user.LoginTypes.Add("Password");
+
+            user.IsLoginPassword = true;
+        }
+
+        user.IsLoginGoogle = user.LoginTypes.Contains("Google");
+
+        return user;
+    }
+
     public async Task<List<AdminUserItemModel>> GetAllUsersAsync()
     {
-        var users = await userManager.Users
-            .ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
+        var users = await userManager
+            .Users.ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
             .ToListAsync();
 
         await context.UserLogins.ForEachAsync(login =>
@@ -39,18 +76,17 @@ public class UserService(UserManager<UserEntity> userManager,
             }
         });
 
-        await context.Users
-       .ForEachAsync(user =>
-       {
-           var adminUser = users.FirstOrDefault(u => u.Id == user.Id);
-           if (adminUser != null)
-           {
-               if (!string.IsNullOrEmpty(user.PasswordHash))
-               {
-                   adminUser.LoginTypes.Add("Password");
-               }
-           }
-       });
+        await context.Users.ForEachAsync(user =>
+        {
+            var adminUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (adminUser != null)
+            {
+                if (!string.IsNullOrEmpty(user.PasswordHash))
+                {
+                    adminUser.LoginTypes.Add("Password");
+                }
+            }
+        });
 
         return users;
     }
@@ -64,9 +100,10 @@ public class UserService(UserManager<UserEntity> userManager,
             string nameFilter = model.Name.Trim().ToLower().Normalize();
 
             query = query.Where(u =>
-                (u.FirstName + " " + u.LastName).ToLower().Contains(nameFilter) ||
-                u.FirstName.ToLower().Contains(nameFilter) ||
-                u.LastName.ToLower().Contains(nameFilter));
+                (u.FirstName + " " + u.LastName).ToLower().Contains(nameFilter)
+                || u.FirstName.ToLower().Contains(nameFilter)
+                || u.LastName.ToLower().Contains(nameFilter)
+            );
         }
 
         if (model?.StartDate != null)
@@ -81,9 +118,11 @@ public class UserService(UserManager<UserEntity> userManager,
 
         if (model.Roles != null && model.Roles.Any())
         {
-            var roles = model.Roles.Where(x=>!string.IsNullOrEmpty(x));
-            if(roles.Count() > 0)
-                query = query.Where(user => roles.Any(role => user.UserRoles.Select(x=>x.Role.Name).Contains(role)));
+            var roles = model.Roles.Where(x => !string.IsNullOrEmpty(x));
+            if (roles.Count() > 0)
+                query = query.Where(user =>
+                    roles.Any(role => user.UserRoles.Select(x => x.Role.Name).Contains(role))
+                );
         }
 
         var totalCount = await query.CountAsync();
@@ -99,7 +138,7 @@ public class UserService(UserManager<UserEntity> userManager,
             .ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
             .ToListAsync();
 
-       //await LoadLoginsAndRolesAsync(users);
+        //await LoadLoginsAndRolesAsync(users);
 
         return new SearchResult<AdminUserItemModel>
         {
@@ -109,8 +148,8 @@ public class UserService(UserManager<UserEntity> userManager,
                 TotalCount = totalCount,
                 TotalPages = totalPages,
                 ItemsPerPage = safeItemsPerPage,
-                CurrentPage = safePage
-            }
+                CurrentPage = safePage,
+            },
         };
     }
 
@@ -120,14 +159,17 @@ public class UserService(UserManager<UserEntity> userManager,
         stopWatch.Start();
         var fakeUsers = new Faker<SeederUserModel>("uk")
             .RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
-           //Pick some fruit from a basket
-           .RuleFor(u => u.FirstName, (f, u) => f.Name.FirstName(u.Gender))
-           .RuleFor(u => u.LastName, (f, u) => f.Name.LastName(u.Gender))
-           .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
-           .RuleFor(u => u.Password, (f, u) => f.Internet.Password(8))
-           .RuleFor(u => u.Roles, f => new List<string>() { f.PickRandom(Constants.Roles.AllRoles) })
-           .RuleFor(u => u.Image, f => "https://thispersondoesnotexist.com");
-            
+            //Pick some fruit from a basket
+            .RuleFor(u => u.FirstName, (f, u) => f.Name.FirstName(u.Gender))
+            .RuleFor(u => u.LastName, (f, u) => f.Name.LastName(u.Gender))
+            .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
+            .RuleFor(u => u.Password, (f, u) => f.Internet.Password(8))
+            .RuleFor(
+                u => u.Roles,
+                f => new List<string>() { f.PickRandom(Constants.Roles.AllRoles) }
+            )
+            .RuleFor(u => u.Image, f => "https://thispersondoesnotexist.com");
+
         var genUsers = fakeUsers.Generate(model.Count);
 
         try
@@ -155,7 +197,6 @@ public class UserService(UserManager<UserEntity> userManager,
                     }
                 }
             }
-
         }
         catch (Exception ex)
         {
@@ -167,10 +208,79 @@ public class UserService(UserManager<UserEntity> userManager,
         TimeSpan ts = stopWatch.Elapsed;
 
         // Format and display the TimeSpan value.
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
+        string elapsedTime = String.Format(
+            "{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours,
+            ts.Minutes,
+            ts.Seconds,
+            ts.Milliseconds / 10
+        );
 
         return elapsedTime;
     }
+
+    public async Task<ServiceResponse> UpdateUserAsync(UserEditModel model)
+    {
+        // 1. Пошук користувача за long Id
+        var user = await userManager.FindByIdAsync(model.Id.ToString());
+
+        if (user == null)
+        {
+            return new ServiceResponse { IsSuccess = false, Message = "Користувача не знайдено." };
+        }
+
+        // 2. Логіка оновлення імені (розбиваємо FullName на FirstName та LastName)
+        if (!string.IsNullOrWhiteSpace(model.FullName))
+        {
+            var parts = model.FullName.Trim().Split(' ', 2);
+            user.FirstName = parts[0];
+            user.LastName = parts.Length > 1 ? parts[1] : string.Empty;
+        }
+
+        // 3. Оновлення Email (якщо потрібно)
+        if (!string.IsNullOrWhiteSpace(model.Email) && user.Email != model.Email)
+        {
+            user.Email = model.Email;
+            user.UserName = model.Email;
+        }
+
+        // 4. Робота з фото через ваш IImageService
+        if (model.Image != null)
+        {
+            try
+            {
+                // Видаляємо стару картинку, якщо вона є
+                if (!string.IsNullOrEmpty(user.Image))
+                {
+                    await imageService.DeleteImageAsync(user.Image);
+                }
+
+                // Зберігаємо нову (SaveImageAsync має приймати IFormFile)
+                user.Image = await imageService.SaveImageAsync(model.Image);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Помилка при завантаженні зображення: {ex.Message}",
+                };
+            }
+        }
+
+        // 5. Збереження змін через UserManager
+        var result = await userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            return new ServiceResponse
+            {
+                IsSuccess = false,
+                Message = string.Join(", ", result.Errors.Select(e => e.Description)),
+            };
+        }
+
+        return new ServiceResponse { IsSuccess = true };
+    }
 }
+

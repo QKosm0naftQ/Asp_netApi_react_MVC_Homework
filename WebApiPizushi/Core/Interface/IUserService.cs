@@ -1,3 +1,4 @@
+using Core.Models;
 using Core.Models.Account;
 using Core.Models.AdminUser;
 using Core.Models.Search;
@@ -11,4 +12,7 @@ public interface IUserService
     Task<List<AdminUserItemModel>> GetAllUsersAsync();
     Task<SearchResult<AdminUserItemModel>> SearchUsersAsync(UserSearchModel model);
     Task<string> SeedAsync(SeedItemsModel model);
+    Task<AdminUserItemModel> GetByIdAsync(long id);
+    Task<ServiceResponse> UpdateUserAsync(UserEditModel model);
 }
+
