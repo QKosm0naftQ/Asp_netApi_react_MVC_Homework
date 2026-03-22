@@ -40,7 +40,7 @@ const UserLayout: React.FC = () => {
           <CartDrawer />
           {user ? (
             <>
-              <Link to="/account" className="flex items-center gap-2">
+              <Link to="/profile" className="flex items-center gap-2"> {/*<Link to="/account" className="flex items-center gap-2">*/}
                 <img
                   src={user.image ? `${APP_ENV.IMAGES_50_URL}${user.image}` : '/images/user/default.png'}
                   alt={user.name}
@@ -53,7 +53,7 @@ const UserLayout: React.FC = () => {
                 to="/admin/home"
                 className="bg-white text-orange-500 px-3 py-1 rounded hover:bg-orange-100 transition"
               >
-                Адмінка
+                Адмінка :)
               </Link>
 
 
