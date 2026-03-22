@@ -28,6 +28,7 @@ const UserListPage = React.lazy(() => import("./admin/pages/Users"));
 // Components
 import RequireAdmin from "./components/ProtectedRoute/RequireAdmin.tsx";
 import AdminProductEditPage from "./admin/pages/Products/Edit/AdminProductEditPage.tsx";
+import ProfilePage from "./pages/Order/index.tsx";
 
 
 
@@ -42,7 +43,7 @@ const App: React.FC = () => {
 
             <Route path="/" element={<UserLayout />}>
               <Route index element={<UserHomePage />} />
-
+              <Route path="/profile" element={<ProfilePage />} />
               {/*<Route path={'login'} element={<LoginPage/>} />*/}
               <Route path={'login'} element={<LoginPage />} />
               <Route path={'forgot-password'} element={<ForgotPasswordPage />} />
