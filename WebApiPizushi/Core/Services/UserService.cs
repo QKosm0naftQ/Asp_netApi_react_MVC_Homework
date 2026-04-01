@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Text.Json;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Bogus;
@@ -12,22 +14,22 @@ using Domain.Entities.Identity;
 using MailKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Text.Json;
 using static Bogus.DataSets.Name;
 
 namespace Core.Services;
 
-public class UserService(UserManager<UserEntity> userManager,
+public class UserService(
+    UserManager<UserEntity> userManager,
     IMapper mapper,
     IImageService imageService,
     RoleManager<RoleEntity> roleManager,
-    AppDbPizushiContext context) : IUserService
+    AppDbPizushiContext context
+) : IUserService
 {
     public async Task<List<AdminUserItemModel>> GetAllUsersAsync()
     {
-        var users = await userManager.Users
-            .ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
+        var users = await userManager
+            .Users.ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
             .ToListAsync();
 
         await context.UserLogins.ForEachAsync(login =>
@@ -39,18 +41,17 @@ public class UserService(UserManager<UserEntity> userManager,
             }
         });
 
-        await context.Users
-       .ForEachAsync(user =>
-       {
-           var adminUser = users.FirstOrDefault(u => u.Id == user.Id);
-           if (adminUser != null)
-           {
-               if (!string.IsNullOrEmpty(user.PasswordHash))
-               {
-                   adminUser.LoginTypes.Add("Password");
-               }
-           }
-       });
+        await context.Users.ForEachAsync(user =>
+        {
+            var adminUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (adminUser != null)
+            {
+                if (!string.IsNullOrEmpty(user.PasswordHash))
+                {
+                    adminUser.LoginTypes.Add("Password");
+                }
+            }
+        });
 
         return users;
     }
@@ -64,9 +65,10 @@ public class UserService(UserManager<UserEntity> userManager,
             string nameFilter = model.Name.Trim().ToLower().Normalize();
 
             query = query.Where(u =>
-                (u.FirstName + " " + u.LastName).ToLower().Contains(nameFilter) ||
-                u.FirstName.ToLower().Contains(nameFilter) ||
-                u.LastName.ToLower().Contains(nameFilter));
+                (u.FirstName + " " + u.LastName).ToLower().Contains(nameFilter)
+                || u.FirstName.ToLower().Contains(nameFilter)
+                || u.LastName.ToLower().Contains(nameFilter)
+            );
         }
 
         if (model?.StartDate != null)
@@ -81,9 +83,11 @@ public class UserService(UserManager<UserEntity> userManager,
 
         if (model.Roles != null && model.Roles.Any())
         {
-            var roles = model.Roles.Where(x=>!string.IsNullOrEmpty(x));
-            if(roles.Count() > 0)
-                query = query.Where(user => roles.Any(role => user.UserRoles.Select(x=>x.Role.Name).Contains(role)));
+            var roles = model.Roles.Where(x => !string.IsNullOrEmpty(x));
+            if (roles.Count() > 0)
+                query = query.Where(user =>
+                    roles.Any(role => user.UserRoles.Select(x => x.Role.Name).Contains(role))
+                );
         }
 
         var totalCount = await query.CountAsync();
@@ -99,7 +103,7 @@ public class UserService(UserManager<UserEntity> userManager,
             .ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
             .ToListAsync();
 
-       //await LoadLoginsAndRolesAsync(users);
+        //await LoadLoginsAndRolesAsync(users);
 
         return new SearchResult<AdminUserItemModel>
         {
@@ -109,8 +113,8 @@ public class UserService(UserManager<UserEntity> userManager,
                 TotalCount = totalCount,
                 TotalPages = totalPages,
                 ItemsPerPage = safeItemsPerPage,
-                CurrentPage = safePage
-            }
+                CurrentPage = safePage,
+            },
         };
     }
 
@@ -120,14 +124,17 @@ public class UserService(UserManager<UserEntity> userManager,
         stopWatch.Start();
         var fakeUsers = new Faker<SeederUserModel>("uk")
             .RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
-           //Pick some fruit from a basket
-           .RuleFor(u => u.FirstName, (f, u) => f.Name.FirstName(u.Gender))
-           .RuleFor(u => u.LastName, (f, u) => f.Name.LastName(u.Gender))
-           .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
-           .RuleFor(u => u.Password, (f, u) => f.Internet.Password(8))
-           .RuleFor(u => u.Roles, f => new List<string>() { f.PickRandom(Constants.Roles.AllRoles) })
-           .RuleFor(u => u.Image, f => "https://thispersondoesnotexist.com");
-            
+            //Pick some fruit from a basket
+            .RuleFor(u => u.FirstName, (f, u) => f.Name.FirstName(u.Gender))
+            .RuleFor(u => u.LastName, (f, u) => f.Name.LastName(u.Gender))
+            .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
+            .RuleFor(u => u.Password, (f, u) => f.Internet.Password(8))
+            .RuleFor(
+                u => u.Roles,
+                f => new List<string>() { f.PickRandom(Constants.Roles.AllRoles) }
+            )
+            .RuleFor(u => u.Image, f => "https://thispersondoesnotexist.com");
+
         var genUsers = fakeUsers.Generate(model.Count);
 
         try
@@ -155,7 +162,6 @@ public class UserService(UserManager<UserEntity> userManager,
                     }
                 }
             }
-
         }
         catch (Exception ex)
         {
@@ -167,10 +173,70 @@ public class UserService(UserManager<UserEntity> userManager,
         TimeSpan ts = stopWatch.Elapsed;
 
         // Format and display the TimeSpan value.
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
+        string elapsedTime = String.Format(
+            "{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours,
+            ts.Minutes,
+            ts.Seconds,
+            ts.Milliseconds / 10
+        );
 
         return elapsedTime;
     }
+
+    // ------------ GetId
+    public async Task<AdminUserItemModel?> GetByIdAsync(long id)
+    {
+        // Отримуємо юзера та одразу мапимо його в модель через AutoMapper
+        var user = await userManager
+            .Users.Where(x => x.Id == id)
+            .ProjectTo<AdminUserItemModel>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+            return null;
+
+        // Додаємо типи логіну (як ти робиш у GetAllUsers)
+        var logins = await context
+            .UserLogins.Where(l => l.UserId == id)
+            .Select(l => l.LoginProvider)
+            .ToListAsync();
+
+        user.LoginTypes.AddRange(logins);
+
+        // Перевіряємо наявність пароля
+        var userEntity = await userManager.FindByIdAsync(id.ToString());
+        if (userEntity != null && !string.IsNullOrEmpty(userEntity.PasswordHash))
+        {
+            user.LoginTypes.Add("Password");
+        }
+
+        return user;
+    }
+
+    public async Task<bool> UpdateUserAsync(UserEditModel model)
+    {
+        var user = await userManager.FindByIdAsync(model.Id.ToString());
+        if (user == null)
+            return false;
+
+        // Оновлюємо основні дані
+        // Якщо у тебе в Entity Прізвище та Ім'я окремо, а в моделі FullName,
+        // можна розбити рядок або просто записати у FirstName
+        user.FirstName = model.FullName;
+        user.Email = model.Email;
+        user.UserName = model.Email; // Важливо для Identity
+
+        // Якщо завантажено нове фото
+        if (model.Image != null)
+        {
+            // Видаляємо старе фото (бажано) і зберігаємо нове
+            // imageService.SaveImageAsync повертає ім'я файлу
+            user.Image = await imageService.SaveImageAsync(model.Image);
+        }
+
+        var result = await userManager.UpdateAsync(user);
+        return result.Succeeded;
+    }
 }
+

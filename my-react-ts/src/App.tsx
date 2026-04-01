@@ -30,7 +30,8 @@ const UserListPage = React.lazy(() => import("./admin/pages/Users"));
 // Components
 import RequireAdmin from "./components/ProtectedRoute/RequireAdmin.tsx";
 import AdminProductEditPage from "./admin/pages/Products/Edit/AdminProductEditPage.tsx";
-import ProfilePage from "./pages/Order/index.tsx";
+import OrderStatusPage from "./pages/Order/index.tsx";
+import ProfilePage from "./pages/Account/Profile/index.tsx";
 
 const App: React.FC = () => {
   return (
@@ -42,7 +43,10 @@ const App: React.FC = () => {
           <Route path="/" element={<UserLayout />}>
             <Route index element={<UserHomePage />} />
             {/* ВАШ НОВИЙ РОУТ */}
-            <Route path="profile" element={<ProfilePage />} />
+            <Route path="profile">
+              <Route index element={<ProfilePage />} />
+              <Route path="order" element={<OrderStatusPage />} />
+            </Route>
 
             <Route path="login" element={<LoginPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
@@ -75,7 +79,7 @@ const App: React.FC = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </React.Suspense>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 

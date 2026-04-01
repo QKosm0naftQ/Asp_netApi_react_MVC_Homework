@@ -1,7 +1,7 @@
 import { useGetUserOrdersQuery } from "../../services/apiOrder.ts"; // Твій сервіс
 import { APP_ENV } from "../../env";
 
-const ProfilePage = () => {
+const OrderStatusPage = () => {
   // 1. Використовуємо RTK Query замість axios + useEffect
   // Він сам керує isLoading, помилками та кешуванням
   const { data, isLoading, isError } = useGetUserOrdersQuery();
@@ -73,4 +73,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default OrderStatusPage;
