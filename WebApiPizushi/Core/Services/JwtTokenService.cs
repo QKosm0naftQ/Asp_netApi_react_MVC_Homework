@@ -8,10 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Core.Services;
 
-public class JwtTokenService(
-    IConfiguration configuration,
-    UserManager<UserEntity> userManager
-    ) : IJwtTokenService
+public class JwtTokenService(IConfiguration configuration, UserManager<UserEntity> userManager)
+    : IJwtTokenService
 {
     public async Task<string> CreateTokenAsync(UserEntity user)
     {
@@ -19,9 +17,10 @@ public class JwtTokenService(
 
         var claims = new List<Claim>
         {
+            new Claim("id", user.Id.ToString()),
             new Claim("email", user.Email),
             new Claim("name", $"{user.LastName} {user.FirstName}"),
-            new Claim("image", $"{user.Image}")
+            new Claim("image", $"{user.Image}"),
         };
         foreach (var role in await userManager.GetRolesAsync(user))
         {
@@ -37,16 +36,19 @@ public class JwtTokenService(
         //вказуємо ключ і алгоритм підпису токена
         var signingCredentials = new SigningCredentials(
             symmetricSecurityKey,
-            SecurityAlgorithms.HmacSha256);
+            SecurityAlgorithms.HmacSha256
+        );
 
         //створюємо токен
         var jwtSecurityToken = new JwtSecurityToken(
             claims: claims, //список параметрів у токені, які є доступні
             expires: DateTime.UtcNow.AddDays(7), // термін дії токена - після цього часу токен буде недійсний
-            signingCredentials: signingCredentials);
+            signingCredentials: signingCredentials
+        );
 
         string token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
         return token;
     }
 }
+

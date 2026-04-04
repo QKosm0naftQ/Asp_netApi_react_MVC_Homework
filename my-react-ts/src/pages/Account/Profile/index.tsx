@@ -16,38 +16,42 @@ const ProfilePage = () => {
   const [forgotPassword, { isLoading: isSendingEmail }] = useForgotPasswordMutation();
 
   const orders = (ordersData as unknown as any[]) || [];
-
+  // TODO: Налаштувати зміну даннихі
+  // FIX: Змінити бо fullname це імя а не імяІФамілія - в бд іменя (імя імя фамілія) - пофіксити!
   // --- Логіка оновлення профілю ---
   const onFinish = async (values: any) => {
-    // 1. Отримуємо ID. 
-    // Переконайся, що в Redux після логіну в об'єкті user є поле id!
-    const userId = user?.id;
+    // 1. Спробуємо дістати ID (враховуючи, що він може бути великою або малою літерою в об'єкті)
+    const userId = user?.id || (user as any)?.Id;
 
     if (!userId) {
-      message.error("Помилка: ID користувача не знайдено в системі.");
-      console.log("Current user object in Redux:", user);
+      message.error("Помилка: ID користувача не знайдено. Перезайдіть в акаунт.");
+      console.log("Вміст user у Redux:", user);
       return;
     }
 
     const formData = new FormData();
-    // Використовуємо великі літери, як у твоєму Swagger (Id, FullName, Email, Image)
+    // Використовуємо ключі точно як у Swagger
     formData.append("Id", String(userId));
     formData.append("FullName", values.fullName);
     formData.append("Email", user?.email || "");
 
-    if (values.image?.file?.originFileObj) {
-      formData.append("Image", values.image.file.originFileObj);
+    // Обробка фото: Ant Design Upload зберігає файл у values.image.fileList або values.image.file
+    const file = values.image?.file?.originFileObj || (values.image?.fileList && values.image.fileList[0]?.originFileObj);
+
+    if (file) {
+      formData.append("Image", file);
     }
 
     try {
-      // Викликаємо мутацію
       await updateUser(formData).unwrap();
-      message.success("Дані успішно оновлено!");
+      message.success("Профіль успішно оновлено!");
+
+      // Порада: тут можна було б зробити рефетч даних або просто сповістити користувача
     } catch (err: any) {
-      console.error("Update error:", err);
-      // Якщо бекенд повернув помилку валідації
-      const errorMsg = err.data?.errors?.Id || "Помилка при оновленні профілю";
-      message.error(errorMsg);
+      console.error("Помилка запиту:", err);
+      // Витягуємо помилку з відповіді сервера (якщо вона є)
+      const serverError = err.data?.errors ? Object.values(err.data.errors).flat()[0] : "Помилка сервера";
+      message.error(`Не вдалося оновити: ${serverError}`);
     }
   };
 

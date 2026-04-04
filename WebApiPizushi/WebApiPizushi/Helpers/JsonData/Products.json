@@ -1,0 +1,23 @@
+[
+  {
+    "Name": "Піца Цезаре",
+    "CategorySlug": "pizza",
+    "Price": 195,
+    "Weight": 540,
+    "Image": "https://lovepizza.com.ua/images/virtuemart/product/cezar.500x500.png"
+  },
+  {
+    "Name": "Суші Філадельфія",
+    "CategorySlug": "sushi",
+    "Price": 250,
+    "Weight": 300,
+    "Image": "https://aleksandrsann.com.ua/images/virtuemart/product/filadelfiya-z-lososem.png"
+  },
+  {
+    "Name": "Салат Грецький",
+    "CategorySlug": "salads",
+    "Price": 120,
+    "Weight": 250,
+    "Image": "https://i.obozrevatel.com/food/recipestep/2020/1/27/orig_1580126761.jpg"
+  }
+]

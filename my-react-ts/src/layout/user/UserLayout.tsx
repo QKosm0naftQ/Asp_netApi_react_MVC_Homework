@@ -1,46 +1,65 @@
 import { Link, Outlet } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../store";
-// import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../store/authSlice.ts";
-import { Button } from "antd";
+import { Button, Input } from "antd"; // Додав Input сюди
 import { APP_ENV } from "../../env";
 import { useCart } from "../../hooks/useCart.ts";
 import { apiCart } from "../../services/apiCart.ts";
 import { addItem } from "../../store/localCartSlice.ts";
 import CartDrawer from "../../components/Cart/CartDrewer";
 
+const { Search } = Input; // Витягуємо компонент пошуку
+
 const UserLayout: React.FC = () => {
   const { user } = useAppSelector(state => state.auth);
-
+  const navigate = useNavigate();
   const { cart } = useCart(user != null);
-
   const dispatch = useAppDispatch();
 
-  // console.log("items", items);
   const logoutHandler = async () => {
-    // if (!serverCart?.items) return;
-
     const serverCart = [...cart];
     dispatch(logout());
-    console.log('Server cart', serverCart);
-    dispatch(apiCart.util.resetApiState()); // очищення кешу запитів кошика
-    console.log('Server cart', serverCart);
+    dispatch(apiCart.util.resetApiState());
     serverCart.forEach(item => {
       dispatch(addItem(item));
     });
   }
 
+  // Функція для пошуку
+  const onSearch = (value: string) => {
+    if (value.trim()) {
+      // Перенаправляємо на сторінку продуктів з параметром search
+      navigate(`/products?search=${encodeURIComponent(value)}`);
+    } else {
+      // Якщо пошук порожній, просто йдемо на всі товари
+      navigate(`/products`);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-      <header className="w-full py-4 px-6 bg-orange-500 text-white shadow-md flex justify-between">
-        <h1 className="text-xl font-semibold">FoodDelivery</h1>
+      <header className="w-full py-4 px-6 bg-orange-500 text-white shadow-md flex justify-between items-center">
+
+        <div className="flex items-center gap-8">
+          <Link to="/">
+            <h1 className="text-xl font-semibold cursor-pointer">FoodDelivery</h1>
+          </Link>
+
+          {/* ПУНКТ 4: Пошук додаємо тут */}
+          <Search
+            placeholder="Знайти страву..."
+            allowClear
+            onSearch={onSearch}
+            className="w-48 md:w-80" // Адаптивна ширина
+          />
+        </div>
 
         <div className="flex items-center gap-4">
           <CartDrawer />
           {user ? (
             <>
-              <Link to="/profile" className="flex items-center gap-2"> {/*<Link to="/account" className="flex items-center gap-2">*/}
+              <Link to="/profile" className="flex items-center gap-2">
                 <img
                   src={user.image ? `${APP_ENV.IMAGES_50_URL}${user.image}` : '/images/user/default.png'}
                   alt={user.name}
@@ -51,11 +70,10 @@ const UserLayout: React.FC = () => {
 
               <Link
                 to="/admin/home"
-                className="bg-white text-orange-500 px-3 py-1 rounded hover:bg-orange-100 transition"
+                className="bg-white text-orange-500 px-3 py-1 rounded hover:bg-orange-100 transition hidden md:block"
               >
                 Адмінка :)
               </Link>
-
 
               <Button
                 onClick={() => logoutHandler()}
@@ -72,7 +90,6 @@ const UserLayout: React.FC = () => {
               >
                 Вхід
               </Link>
-
               <Link
                 to="register"
                 className="bg-white text-orange-500 px-4 py-2 rounded hover:bg-orange-100 transition"
@@ -82,7 +99,6 @@ const UserLayout: React.FC = () => {
             </>
           )}
         </div>
-
       </header>
 
       <main className="flex-1 p-4 md:p-6">

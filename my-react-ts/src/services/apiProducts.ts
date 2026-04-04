@@ -23,6 +23,14 @@ export const apiProducts = createApi({
       },
       invalidatesTags: ['Products'],
     }),
+    // ... твій існуючий код apiProduct
+    getProducts: builder.query<ProductItemModel[], void>({
+      query: () => 'Products/list', // або твій ендпоінт для всіх товарів
+      providesTags: ['Products'],
+    }),
+    getProductBySlug: builder.query<ProductItemModel[], string>({
+      query: (slug) => `Products/slug/${slug}`,
+    }),
     getIngredients: builder.query<ProductIngredientModel[], void>({
       query: () => {
 

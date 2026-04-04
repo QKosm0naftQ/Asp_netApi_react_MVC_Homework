@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Core.Constants;
 using Core.Interface;
 using Core.Models.Seeder;
@@ -8,7 +9,6 @@ using Domain.Entities.Delivery;
 using Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace WebApiPizushi;
 
@@ -29,23 +29,28 @@ public static class DbSeeder
         if (!context.Categories.Any())
         {
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
-            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Categories.json");
+            var jsonFile = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Helpers",
+                "JsonData",
+                "Categories.json"
+            );
             if (File.Exists(jsonFile))
             {
                 var jsonData = await File.ReadAllTextAsync(jsonFile);
                 try
                 {
-                    var categories = JsonSerializer.Deserialize<List<SeederCategoryModel>>(jsonData);
+                    var categories = JsonSerializer.Deserialize<List<SeederCategoryModel>>(
+                        jsonData
+                    );
                     var entityItems = mapper.Map<List<CategoryEntity>>(categories);
                     foreach (var entity in entityItems)
                     {
-                        entity.Image =
-                            await imageService.SaveImageFromUrlAsync(entity.Image);
+                        entity.Image = await imageService.SaveImageFromUrlAsync(entity.Image);
                     }
 
                     await context.AddRangeAsync(entityItems);
                     await context.SaveChangesAsync();
-
                 }
                 catch (Exception ex)
                 {
@@ -61,7 +66,12 @@ public static class DbSeeder
         if (!context.Ingredients.Any())
         {
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
-            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Ingredients.json");
+            var jsonFile = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Helpers",
+                "JsonData",
+                "Ingredients.json"
+            );
             if (File.Exists(jsonFile))
             {
                 var jsonData = await File.ReadAllTextAsync(jsonFile);
@@ -71,13 +81,11 @@ public static class DbSeeder
                     var entityItems = mapper.Map<List<IngredientEntity>>(items);
                     foreach (var entity in entityItems)
                     {
-                        entity.Image =
-                            await imageService.SaveImageFromUrlAsync(entity.Image);
+                        entity.Image = await imageService.SaveImageFromUrlAsync(entity.Image);
                     }
 
                     await context.Ingredients.AddRangeAsync(entityItems);
                     await context.SaveChangesAsync();
-
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +100,12 @@ public static class DbSeeder
 
         if (!context.ProductSizes.Any())
         {
-            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "ProductSizes.json");
+            var jsonFile = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Helpers",
+                "JsonData",
+                "ProductSizes.json"
+            );
             if (File.Exists(jsonFile))
             {
                 var jsonData = await File.ReadAllTextAsync(jsonFile);
@@ -102,7 +115,6 @@ public static class DbSeeder
                     var entityItems = mapper.Map<List<ProductSizeEntity>>(items);
                     await context.ProductSizes.AddRangeAsync(entityItems);
                     await context.SaveChangesAsync();
-
                 }
                 catch (Exception ex)
                 {
@@ -115,115 +127,79 @@ public static class DbSeeder
             }
         }
 
-        if (context.Products.Count()==0)
+        if (!context.Products.Any())
         {
-            var сaesar = new ProductEntity
-            {
-                Name = "Цезаре",
-                Slug = "caesar",
-                Price = 195,
-                Weight = 540,
-                CategoryId = 1, // Assuming the first category is for Caesar
-                ProductSizeId = 1 // Assuming the first size is for Caesar
-            };
-
-            context.Products.Add(сaesar);
-            await context.SaveChangesAsync();
-
-            var ingredients = context.Ingredients.ToList();
-
-            foreach(var ingredient in ingredients)
-            {
-                var productIngredient = new ProductIngredientEntity
-                {
-                    ProductId = сaesar.Id,
-                    IngredientId = ingredient.Id
-                };
-                context.ProductIngredients.Add(productIngredient);
-            }
-            await context.SaveChangesAsync();
-
-            string[] images = {
-                "https://lovepizza.com.ua/images/virtuemart/product/cezar.500x500.png",
-                "https://cipollino.ua/content/uploads/images/pytstsa-tsezar-svezhest-khrustiashchest-y-sytost-cipollino.jpg",
-                "https://cipollino.ua/content/uploads/images/pytstsa-tsezar-svezhest-khrustiashchest-y-sytost-2-cipollino.jpg"
-            };
-
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
-            foreach (var imageUrl in images)
+            var jsonFile = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Helpers",
+                "JsonData",
+                "Products.json"
+            );
+
+            if (File.Exists(jsonFile))
             {
-                try
+                var jsonData = await File.ReadAllTextAsync(jsonFile);
+                var productsData = JsonSerializer.Deserialize<List<SeederProductModel>>(jsonData);
+
+                // Отримуємо всі категорії та інгредієнти одним запитом для швидкості
+                var categories = await context.Categories.ToListAsync();
+                var allIngredients = await context.Ingredients.Take(5).ToListAsync(); // Беремо перші 5 інгредієнтів
+
+                foreach (var item in productsData!)
                 {
-                    var productImage = new ProductImageEntity
+                    // Шукаємо категорію за слагом
+                    var category = categories.FirstOrDefault(c =>
+                        c.Slug.ToLower() == item.CategorySlug.ToLower()
+                    );
+                    if (category == null)
+                        continue;
+
+                    var product = new ProductEntity
                     {
-                        ProductId = сaesar.Id,
-                        Name = await imageService.SaveImageFromUrlAsync(imageUrl)
+                        Name = item.Name,
+                        Slug = item.Name.ToLower().Replace(" ", "-"), // Простий генератор слага
+                        Price = item.Price,
+                        Weight = item.Weight,
+                        CategoryId = category.Id,
+                        ProductSizeId = 1, // Можна захардкодити або зробити null
                     };
-                    context.ProductImages.Add(productImage);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error Save Image {0} - {1}", imageUrl, ex.Message);
-                }
-            }
-            await context.SaveChangesAsync();
 
-        }
+                    context.Products.Add(product);
+                    await context.SaveChangesAsync(); // Зберігаємо, щоб отримати ProductId
 
-        if (context.Products.Count() == 1)
-        {
-            var сaesar = new ProductEntity
-            {
-                Name = "Цезаре",
-                Slug = "caesar",
-                Price = 355,
-                Weight = 1080,
-                CategoryId = 1, // Assuming the first category is for Caesar
-                ProductSizeId = 2 // Assuming the first size is for Caesar
-            };
-
-            context.Products.Add(сaesar);
-            await context.SaveChangesAsync();
-
-            var ingredients = context.Ingredients.ToList();
-
-            foreach (var ingredient in ingredients)
-            {
-                var productIngredient = new ProductIngredientEntity
-                {
-                    ProductId = сaesar.Id,
-                    IngredientId = ingredient.Id
-                };
-                context.ProductIngredients.Add(productIngredient);
-            }
-            await context.SaveChangesAsync();
-
-            string[] images = {
-                "https://kvadratsushi.com/wp-content/uploads/2020/06/chezar_1200x800.jpg",
-                "https://kingpizza.kh.ua/resources/products/20210810115749_ca6b6cbe9b.jpg"
-            };
-
-            var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
-            foreach (var imageUrl in images)
-            {
-                try
-                {
-                    var productImage = new ProductImageEntity
+                    // 1. Додаємо фото (одне і те саме для категорії згідно JSON)
+                    try
                     {
-                        ProductId = сaesar.Id,
-                        Name = await imageService.SaveImageFromUrlAsync(imageUrl)
-                    };
-                    context.ProductImages.Add(productImage);
+                        var imageName = await imageService.SaveImageFromUrlAsync(item.Image);
+                        context.ProductImages.Add(
+                            new ProductImageEntity
+                            {
+                                ProductId = product.Id,
+                                Name = imageName,
+                                Priority = 1,
+                            }
+                        );
+                    }
+                    catch
+                    { /* пропускаємо помилки фото */
+                    }
+
+                    // 2. Додаємо інгредієнти (для солідності)
+                    foreach (var ing in allIngredients)
+                    {
+                        context.ProductIngredients.Add(
+                            new ProductIngredientEntity
+                            {
+                                ProductId = product.Id,
+                                IngredientId = ing.Id,
+                            }
+                        );
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error Save Image {0} - {1}", imageUrl, ex.Message);
-                }
+                await context.SaveChangesAsync();
             }
-            await context.SaveChangesAsync();
-
         }
-
 
         if (!context.Roles.Any())
         {
@@ -240,7 +216,12 @@ public static class DbSeeder
         if (!context.Users.Any())
         {
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
-            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Users.json");
+            var jsonFile = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Helpers",
+                "JsonData",
+                "Users.json"
+            );
             if (File.Exists(jsonFile))
             {
                 var jsonData = await File.ReadAllTextAsync(jsonFile);
@@ -270,7 +251,6 @@ public static class DbSeeder
                             }
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -285,14 +265,26 @@ public static class DbSeeder
 
         if (!context.OrderStatuses.Any())
         {
-            List<string> names = new List<string>() {
-                "Нове", "Очікує оплати", "Оплачено",
-                "В обробці", "Готується до відправки",
-                "Відправлено", "У дорозі", "Доставлено",
-                "Завершено", "Скасовано (вручну)", "Скасовано (автоматично)",
-                "Повернення", "В обробці повернення" };
+            List<string> names = new List<string>()
+            {
+                "Нове",
+                "Очікує оплати",
+                "Оплачено",
+                "В обробці",
+                "Готується до відправки",
+                "Відправлено",
+                "У дорозі",
+                "Доставлено",
+                "Завершено",
+                "Скасовано (вручну)",
+                "Скасовано (автоматично)",
+                "Повернення",
+                "В обробці повернення",
+            };
 
-            var orderStatuses = names.Select(name => new OrderStatusEntity { Name = name }).ToList();
+            var orderStatuses = names
+                .Select(name => new OrderStatusEntity { Name = name })
+                .ToList();
 
             await context.OrderStatuses.AddRangeAsync(orderStatuses);
             await context.SaveChangesAsync();
@@ -302,21 +294,9 @@ public static class DbSeeder
         {
             List<OrderEntity> orders = new List<OrderEntity>
             {
-                new OrderEntity
-                {
-                    UserId = 1,
-                    OrderStatusId = 1,
-                },
-                new OrderEntity
-                {
-                    UserId = 1,
-                    OrderStatusId = 10,
-                },
-                new OrderEntity
-                {
-                    UserId = 1,
-                    OrderStatusId = 9,
-                },
+                new OrderEntity { UserId = 1, OrderStatusId = 1 },
+                new OrderEntity { UserId = 1, OrderStatusId = 10 },
+                new OrderEntity { UserId = 1, OrderStatusId = 9 },
             };
 
             context.Orders.AddRange(orders);
@@ -331,11 +311,12 @@ public static class DbSeeder
 
             foreach (var order in orders)
             {
-                var existing = await context.OrderItems
-                    .Where(x => x.OrderId == order.Id)
+                var existing = await context
+                    .OrderItems.Where(x => x.OrderId == order.Id)
                     .ToListAsync();
 
-                if (existing.Count > 0) continue;
+                if (existing.Count > 0)
+                    continue;
 
                 var productCount = rand.Next(1, Math.Min(5, products.Count + 1));
 
@@ -345,14 +326,15 @@ public static class DbSeeder
                     .Take(productCount)
                     .ToList();
 
-
-                var orderItems = selectedProducts.Select(product => new OrderItemEntity
-                {
-                    OrderId = order.Id,
-                    ProductId = product.Id,
-                    PriceBuy = product.Price,
-                    Count = rand.Next(1, 5),
-                }).ToList();
+                var orderItems = selectedProducts
+                    .Select(product => new OrderItemEntity
+                    {
+                        OrderId = order.Id,
+                        ProductId = product.Id,
+                        PriceBuy = product.Price,
+                        Count = rand.Next(1, 5),
+                    })
+                    .ToList();
 
                 context.OrderItems.AddRange(orderItems);
             }
@@ -360,12 +342,10 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-
         //if (!context.Cities.Any())
         //{
         //    await novaPosta.FetchCitiesAsync();
         //}
-
 
         if (!context.PostDepartments.Any())
         {
@@ -409,7 +389,7 @@ public static class DbSeeder
             var list = new List<PaymentTypeEntity>
             {
                 new PaymentTypeEntity { Name = "Готівка" },
-                new PaymentTypeEntity { Name = "Картка" }
+                new PaymentTypeEntity { Name = "Картка" },
             };
 
             await context.PaymentTypes.AddRangeAsync(list);
